@@ -1,1 +1,4 @@
 # AutomatedLungSoundSegmenetation
+This project deals with automated lung sound segmentation. 
+
+Day 1: Found this intresting paper out Turkey that uses dyanamic time warping (DTW) to fit the lung sounds intiatlly. Have alot of the preprocessing methods already build for parsing raw lungs sounds and there assocaited ground truth from the DSW paper. Going to revive this work as a fist step to implementing the segmenetation methods.
