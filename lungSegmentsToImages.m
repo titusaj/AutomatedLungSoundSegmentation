@@ -57,10 +57,10 @@ for i = 4:2:length(files)
                 %time make up 
                 dt = 1/Fs;
                 Norig = length(rawWholeSignal);
-                t = 0:dt:(Norig*dt)-dt;
+                rawTime = 0:dt:(Norig*dt)-dt;
                 
-                [d, indexStart] = min( abs( t-round(cycleStart(j),3) ));
-                [d, indexEnd ] = min( abs( t-round(cycleEnd(j),3) ));                    
+                [d, indexStart] = min( abs( rawTime-round(cycleStart(j),3) ));
+                [d, indexEnd ] = min( abs( rawTime-round(cycleEnd(j),3) ));                    
                 groundTruthSegmentedSignal = rawWholeSignal(indexStart:indexEnd);
                  %groundTruthSegmentedSignal = downsample(groundTruthSegmentedSignal,10);
                 

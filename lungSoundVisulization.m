@@ -53,9 +53,29 @@ end
 bandPower = [];
 
 for k = 1:length(s(1,:))
-    k
+
     rawBand = s(:,k);
     Ex = norm(rawBand,2)^2;  % the energy
-    Px = 1/numel(rawBand)*norm(rawBand,2)^2 % power
+    Px = 1/numel(rawBand)*norm(rawBand,2)^2; % power
     bandPower(k)= Px; 
+end
+
+
+
+smoothBandPower = smoothn(bandPower,'robust');
+
+
+figure
+hold on
+plot(t, bandPower)
+TF = islocalmin(smoothBandPower);
+plot(t,smoothBandPower,t(TF),smoothBandPower(TF),'r*')
+
+ 
+ for i=1:length(cycleStart)
+    vline([cycleStart(i)],['g'])
+end
+
+for i=1:length(cycleEnd)
+    vline([cycleEnd(i)],['r'])
 end
