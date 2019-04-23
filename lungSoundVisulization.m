@@ -62,7 +62,7 @@ end
 
 
 
-smoothBandPower = smoothn(bandPower,'robust');
+smoothBandPower = smoothn(bandPower,30);
 
 
 figure
@@ -72,6 +72,17 @@ TF = islocalmin(smoothBandPower);
 plot(t,smoothBandPower,t(TF),smoothBandPower(TF),'r*')
 
  
+ for i=1:length(cycleStart)
+    vline([cycleStart(i)],['g'])
+end
+
+for i=1:length(cycleEnd)
+    vline([cycleEnd(i)],['r'])
+end
+
+figure
+hold on
+plot(t,smoothBandPower,t(TF),smoothBandPower(TF),'r*')
  for i=1:length(cycleStart)
     vline([cycleStart(i)],['g'])
 end
