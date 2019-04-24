@@ -6,4 +6,8 @@ Day 1: Found this intresting paper out Turkey that uses dyanamic time warping (D
 
 Day 2: Still trying to figure out how to implement the smooth version of the power band of the spectogram transform, working on getting that working with a hanning window implementation
 
-Day 3: Going to work on the deep learning version of this implemetnation today. Working with tensorflow to implement a LSTM..
+Day 3: Going to work on the deep learning version of this implemetnation today. Working with tensorflow to implement a LSTM.
+
+Day 4: Still working on how to insert this into an LSTM for segmentatition not finding any examples whre they are putting the ground truth into the proccessing pipeline.
+
+Day 5: Figuring out how to do the ground truth segmentation smoothing function to match what is seen in the paper.
