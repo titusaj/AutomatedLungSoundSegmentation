@@ -10,4 +10,8 @@ Day 3: Going to work on the deep learning version of this implemetnation today. 
 
 Day 4: Still working on how to insert this into an LSTM for segmentatition not finding any examples whre they are putting the ground truth into the proccessing pipeline.
 
-Day 5: Figuring out how to do the ground truth segmentation smoothing function to match what is seen in the paper.
+Day 5: Figuring out how to do the ground truth segmentation smoothing function to match what is seen in the paper
+
+Day 6: Figured out the problem in how the mean energy was be calculated,working out how to fix this power represenation problem.
+
+.
