@@ -16,7 +16,7 @@ normalCount = 1;
 %Segemented groundTrutch signals with correponding Fs
 Signals = {};
 
-for i = 4:2:length(files)
+for i = 30:2:length(files)
     
     cycleStart = [];
     cycleEnd = [];
@@ -86,6 +86,14 @@ for i = 4:2:length(files)
                     wn= [80 1000]*2 /Fs;
                     n=4;
                     [b,a] = butter(n,wn,'bandpass');
+                    
+                    % Zero-Pole-Gain design
+                    [z,p,k] = butter(n,wn,'bandpass');
+                    sos = zp2sos(z,p,k);
+                    
+                    
+                    
+                    
                     filter_out= filtfilt(b,a,rawWholeSignal);
                     filter_out = filter_out/max(abs(filter_out));
 
