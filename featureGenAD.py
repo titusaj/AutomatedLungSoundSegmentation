@@ -1,19 +1,18 @@
 #Simple 1 Layer AutoEncodere in In Python
-
 from keras.layers import Input, Dense
-from keras.models import models
+from keras.models import Model
+from keras import regularizers
 
 #The size of the the encoded representation
-encoding_dim = 32 #32 floats
+encoding_dim = 32 #128 floats
 
-#Input placeholder
-input_img = Input(shape(784,))
-
-# encoded is the encoded representation of the input
-encoded = Dense(encoding_dim,activation='relu')(input_img)
-
-#decoded is the lossy reconstruction of the input
+# this is our input placeholder
+input_img = Input(shape=(784,))
+# "encoded" is the encoded representation of the input
+encoded = Dense(encoding_dim, activation='relu')(input_img)
+# "decoded" is the lossy reconstruction of the input
 decoded = Dense(784, activation='sigmoid')(encoded)
+
 
 #This model maps an input to its reconstruction
 autoencoder = Model(input_img,decoded)
@@ -21,10 +20,12 @@ autoencoder = Model(input_img,decoded)
 # this model maps an input to its encoded representation
 encoder = Model(input_img, encoded)
 
-# create a placeholder for an encoded (32-dimensional) input
+# create a placeholder for an encoded (128-dimensional) input
 encoded_input = Input(shape=(encoding_dim,))
+
 # retrieve the last layer of the autoencoder model
 decoder_layer = autoencoder.layers[-1]
+
 # create the decoder model
 decoder = Model(encoded_input, decoder_layer(encoded_input))
 
@@ -43,9 +44,12 @@ x_test = x_test.reshape((len(x_test), np.prod(x_test.shape[1:])))
 print x_train.shape
 print x_test.shape
 
+epochs = 5
+bs = 5
+
 autoencoder.fit(x_train, x_train,
-                epochs=50,
-                batch_size=256,
+                epochs=epochs,
+                batch_size=bs,
                 shuffle=True,
                 validation_data=(x_test, x_test))
 

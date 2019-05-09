@@ -6,4 +6,6 @@ Day 1: Found this intresting paper out Turkey that uses dyanamic time warping (D
 
 Day 2: Still trying to figure out how to implement the smooth version of the power band of the spectogram transform, working on getting that working with a hanning window implementation
 
-Day 3: Going to work on the deep learning version of this implemetnation today. Working with tensorflow to implement a LSTM..
+Day 3: Going to work on the deep learning version of this implemetnation today. Working with tensorflow to implement a LSTM.
+
+Day 4: Found paper that implemented unet to do the segmentation, working on intial attempts on this work to get the segmenetation going.
