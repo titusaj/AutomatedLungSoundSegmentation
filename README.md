@@ -13,3 +13,5 @@ Day 4: Still working on how to insert this into an LSTM for segmentatition not f
 Day 5: Figuring out how to do the ground truth segmentation smoothing function to match what is seen in the paper
 
 Day 6: Figured out the problem in how the mean energy was be calculated,working out how to fix this power represenation problem.
+
+Day 7: Working out how to create the network for processing the dataflow in the system.
