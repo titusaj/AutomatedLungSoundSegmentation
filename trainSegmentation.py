@@ -11,6 +11,18 @@ from keras.utils import to_categorical
 from sklearn.model_selection import StratifiedKFold
 from keras.callbacks import EarlyStopping, ModelCheckpoint
 
+from imutils import paths
+import matplotlib.pyplot as plt
+import pylab
+pylab.show
+import numpy as np
+import argparse
+import random
+import cv2
+import os
+
+
+
 # construct the argument parse and parse the arguments
 ap = argparse.ArgumentParser()
 ap.add_argument("-d", "--dataset", required=True,
@@ -29,14 +41,14 @@ EPOCHS = 500
 INIT_LR = 1e-3
 BS = 125
 
-# grab the image eppaths and randomly shuffle them
-imagePaths = sorted(list(paths.list_images(args["dataset"])))
+signalLength = 256; #This represent the length of the vector overal
+
+# grab the audio path will train on all the data within the database
+audioPaths = sorted(list(paths.list_images(args["dataset"])))
 random.seed(42)
 random.shuffle(imagePaths)
 
-# grab the image eppaths and randomly shuffle them
-wheezeCount = 0
-normalCount = 0
-crackleCount = 0
-
-for
+# loop over the custom envolope images
+for envolopeImages in envolopePaths:
+	#Load the processed envelopes and store it in the data list_images
+	envolope = pd
