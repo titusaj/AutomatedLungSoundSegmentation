@@ -28,13 +28,6 @@ for i=1:length(cycleEnd)
     vline([cycleEnd(i)],['r'])
 end
 
-
-
-
-
-
-
-
  win_time = 40/1000; % sec
  overlap_per = 0.5;
  time_interval = win_time * overlap_per; % sec

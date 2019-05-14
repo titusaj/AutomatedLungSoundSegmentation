@@ -16,7 +16,11 @@ normalCount = 1;
 %Segemented groundTrutch signals with correponding Fs
 Signals = {};
 
-for i = 30:2:length(files)
+allCount = 1;
+allTime = [];
+allFs = [];
+
+for i = 4:2:length(files)
     
     cycleStart = [];
     cycleEnd = [];
@@ -51,18 +55,25 @@ for i = 30:2:length(files)
             
 
 %        if cracklePresent(j) == 0 && wheezePresent(j) == 1      
-                wheezeCount = wheezeCount + 1
+                %wheezeCount = wheezeCount + 1
                 
                 [rawWholeSignal,Fs] = audioread(wavFilename ); %Read the signal in if applicable
                 %time make up 
                 dt = 1/Fs;
                 Norig = length(rawWholeSignal);
                 rawTime = 0:dt:(Norig*dt)-dt;
-                
+                allFs(allCount) = rawTime(end);
+                allRawTime(allCount) = Fs;
+                allCount = allCount + 1;
+            
                 [d, indexStart] = min( abs( rawTime-round(cycleStart(j),3) ));
                 [d, indexEnd ] = min( abs( rawTime-round(cycleEnd(j),3) ));                    
                 groundTruthSegmentedSignal = rawWholeSignal(indexStart:indexEnd);
                  %groundTruthSegmentedSignal = downsample(groundTruthSegmentedSignal,10);
+                 
+                 
+                allIndexStarts(cycleCount) = indexStart;
+                allIndexEnds(cycleCount)  = indexEnd;
                 
                
                 
@@ -126,7 +137,10 @@ for i = 30:2:length(files)
 %            end   
     
     end
-
+    
+    [groundTruthEnvolope] = plotGroundTruthEnvelope(allIndexStarts, allIndexEnds,Norig, Fs );
+    [homomorphicEnv, hiltbertEnv, WaveEnv,PSDEnv] = envelopeExtraction(filter_out, Fs);
+     
     fileCount = fileCount+1;
    
 end
