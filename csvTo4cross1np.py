@@ -1,5 +1,7 @@
-def csvTo4cross1np():
-  print("test function")
+# This function takes
 
 
-csvTo4cross1np()
+def csvTo4cross1np(homo, hilb, wave, PSD):
+
+
+print("test function")
