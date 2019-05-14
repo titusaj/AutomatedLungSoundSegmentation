@@ -45,13 +45,22 @@ BS = 4
 
 # initialize the data and labels
 print("[INFO] loading raw vectors in...")
-data = []
+envelopeFiles = []
 labels = []
 
+print(args["dataset"])
+
 # define the paths
-envelopePath = sorted(list(paths.list_images(args["dataset"])))
-random.seed(42)
-random.shuffle(envelopePath)
+for r, d, f in os.walk(args["dataset"]):
+    for file in f:
+        if '.csv' in file:
+			print('got here')
+	        envelopeFiles.append(os.path.join(r, file))
+
+
+for f in envelopeFiles:
+    print(f)
+
 
 labelPath = sorted(list(paths.list_images(args["dataset"])))
 random.seed(42)
