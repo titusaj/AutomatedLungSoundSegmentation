@@ -16,133 +16,135 @@ normalCount = 1;
 %Segemented groundTrutch signals with correponding Fs
 Signals = {};
 
-allCount = 1;
-allTime = [];
-allFs = [];
 
 for i = 4:2:length(files)
-    
-    cycleStart = [];
-    cycleEnd = [];
-    cracklePresent = [];
-    wheezePresent = [];
-    numCycles = 0 ;
-    
-    textFilename = files(i).name;
-    wavFilename = files(i+1).name;
-    
-    temp = strsplit(textFilename,'.');
-    recordingLabel = temp{1};
-    
-    patientNum = textFilename(1:3);
-    
-    
-    audioLabelData =  textread(textFilename); %Read the text file into workspace
-    
-    cycleStart = audioLabelData(:,1); 
-    cycleEnd = audioLabelData(:,2);
-    cracklePresent = audioLabelData(:,3);
-    wheezePresent = audioLabelData(:,4);
-    numCycles = length(cycleStart);
-    
-   
-    imageCreated =0; 
-    
-    for j = 1:numCycles
-           
-        cycleCount = cycleCount+1;
-        %disp(strcat('Cycle Count',num2str(cycleCount)));
+
+            cycleStart = [];
+            cycleEnd = [];
+            cracklePresent = [];
+            wheezePresent = [];
+            numCycles = 0 ;
+
+            textFilename = files(i).name;
+            wavFilename = files(i+1).name;
+
+            temp = strsplit(textFilename,'.');
+            recordingLabel = temp{1};
+
+            patientNum = textFilename(1:3);
+
+
+            audioLabelData =  textread(textFilename); %Read the text file into workspace
+
+            cycleStart = audioLabelData(:,1); 
+            cycleEnd = audioLabelData(:,2);
+            cracklePresent = audioLabelData(:,3);
+            wheezePresent = audioLabelData(:,4);
+            numCycles = length(cycleStart);
+
+            [rawWholeSignal,Fs] = audioread(wavFilename ); %Read the signal in if applicable
+        
+            if Fs == 44100
+
+                    for j = 1:numCycles
+
+                        cycleCount = cycleCount+1;
+
+
+                %        if cracklePresent(j) == 0 && wheezePresent(j) == 1           
+                                %time make up 
+                                dt = 1/Fs;
+                                Norig = length(rawWholeSignal);
+                                rawTime = 0:dt:(Norig*dt)-dt;
+                         
+
+                                [d, indexStart] = min( abs( rawTime-round(cycleStart(j),3) ));
+                                [d, indexEnd ] = min( abs( rawTime-round(cycleEnd(j),3) ));                    
+                                groundTruthSegmentedSignal = rawWholeSignal(indexStart:indexEnd);
+                                 %groundTruthSegmentedSignal = downsample(groundTruthSegmentedSignal,10);
+
+
+                                allIndexStarts(cycleCount) = indexStart;
+                                allIndexEnds(cycleCount)  = indexEnd;
+
+
+
+                %                 Signals.data{crackleCount} = groundTruthSegmentedSignal;
+                %                 Signals.Fs{cracklelCount} = Fs;        
+                                    normalCount= normalCount +1; 
+
+                                    win_time = 40/1000; % sec
+                                    overlap_per = 0.5;
+                                    time_interval = win_time * overlap_per; % sec
+                                    window = round(Fs*win_time);
+                                    noverlap = round(window*overlap_per);
+                                    F = 2048*2;
+
+                % 
+                %                     figure(1)
+                %                     spectrogram(groundTruthSegmentedSignal,window,noverlap,Fs/2,Fs,'yaxis');
+                %                     ylim([0 2])
+
+                                    Fs;
+                                    wn= [80 1000]*2 /Fs;
+                                    n=4;
+                                    [b,a] = butter(n,wn,'bandpass');
+
+                                    % Zero-Pole-Gain design
+                                    [z,p,k] = butter(n,wn,'bandpass');
+                                    sos = zp2sos(z,p,k);
+
+
+
+
+                                    filter_out= filtfilt(b,a,rawWholeSignal);
+                                    filter_out = filter_out/max(abs(filter_out));
+
+
+                %                       figure(4)
+                %                       plot(filter_out)
+                % %                    [wt, period] = cwt( filter_out,Fs); 
+                % 
+                % 
+                %                   
+                % 
+                %         
+                %                     
+                %                      figure(2)
+                %                      spectrogram(filter_out,window,noverlap,Fs/2,Fs,'yaxis');
+                %                      ylim([0 2])
+                %                      
+                %                      figure(3)
+                %                       [wt, period] = cwt(filter_out,Fs); 
+                %                      imagesc(t,period, flipud(abs(wt)));
+                %                      set(gca,'XTick',[]) % Remove the ticks in the x axis!
+                %                      set(gca,'YTick',[]) % Remove the ticks in the y axis
+                %                      set(gca,'Position',[0 0 1 1]) % Make the axes occupy the whole figure
+
+                % %                     cd('normal/')
+                %                     imageName =  strcat('normal','_',recordingLabel,'_',num2str(j));
+                %                     imageName
+                %                     saveas(gcf,imageName,'png')
+                %                     cd ..
+                %            end   
+
+                    end
+             
+            [groundTruthEnvolope] = plotGroundTruthEnvelope(allIndexStarts, allIndexEnds,Norig, Fs );
+            [hilbertEnv] = envelopeExtraction(filter_out, Fs);
+
+            cd('rawVector/')
+            %csvwrite(strcat(temp{1},'_data.csv'),hilbertEnv)
+            mex_WriteMatrix(strcat(temp{1},'_data.csv'),hilbertEnv, '%10.10f', ',', 'w+'); % 30 times faster!
+            cd ..
             
-
-%        if cracklePresent(j) == 0 && wheezePresent(j) == 1      
-                %wheezeCount = wheezeCount + 1
-                
-                [rawWholeSignal,Fs] = audioread(wavFilename ); %Read the signal in if applicable
-                %time make up 
-                dt = 1/Fs;
-                Norig = length(rawWholeSignal);
-                rawTime = 0:dt:(Norig*dt)-dt;
-                allFs(allCount) = rawTime(end);
-                allRawTime(allCount) = Fs;
-                allCount = allCount + 1;
+            cd('labels/')
+            %csvwrite(strcat(temp{1},'_label.csv'),groundTruthEnvolope)
+            mex_WriteMatrix(strcat(temp{1},'_label.csv'),groundTruthEnvolope, '%10.10f', ',', 'w+');  % 30 times faster!
+            cd ..
             
-                [d, indexStart] = min( abs( rawTime-round(cycleStart(j),3) ));
-                [d, indexEnd ] = min( abs( rawTime-round(cycleEnd(j),3) ));                    
-                groundTruthSegmentedSignal = rawWholeSignal(indexStart:indexEnd);
-                 %groundTruthSegmentedSignal = downsample(groundTruthSegmentedSignal,10);
-                 
-                 
-                allIndexStarts(cycleCount) = indexStart;
-                allIndexEnds(cycleCount)  = indexEnd;
-                
-               
-                
-%                 Signals.data{crackleCount} = groundTruthSegmentedSignal;
-%                 Signals.Fs{cracklelCount} = Fs;        
-                    normalCount= normalCount +1; 
-                    
-                    win_time = 40/1000; % sec
-                    overlap_per = 0.5;
-                    time_interval = win_time * overlap_per; % sec
-                    window = round(Fs*win_time);
-                    noverlap = round(window*overlap_per);
-                    F = 2048*2;
-                 
-% 
-%                     figure(1)
-%                     spectrogram(groundTruthSegmentedSignal,window,noverlap,Fs/2,Fs,'yaxis');
-%                     ylim([0 2])
-                    
-                    Fs;
-                    wn= [80 1000]*2 /Fs;
-                    n=4;
-                    [b,a] = butter(n,wn,'bandpass');
-                    
-                    % Zero-Pole-Gain design
-                    [z,p,k] = butter(n,wn,'bandpass');
-                    sos = zp2sos(z,p,k);
-                    
-                    
-                    
-                    
-                    filter_out= filtfilt(b,a,rawWholeSignal);
-                    filter_out = filter_out/max(abs(filter_out));
-
-
-%                       figure(4)
-%                       plot(filter_out)
-% %                    [wt, period] = cwt( filter_out,Fs); 
-% 
-% 
-%                   
-% 
-%         
-%                     
-%                      figure(2)
-%                      spectrogram(filter_out,window,noverlap,Fs/2,Fs,'yaxis');
-%                      ylim([0 2])
-%                      
-%                      figure(3)
-%                       [wt, period] = cwt(filter_out,Fs); 
-%                      imagesc(t,period, flipud(abs(wt)));
-%                      set(gca,'XTick',[]) % Remove the ticks in the x axis!
-%                      set(gca,'YTick',[]) % Remove the ticks in the y axis
-%                      set(gca,'Position',[0 0 1 1]) % Make the axes occupy the whole figure
-
-% %                     cd('normal/')
-%                     imageName =  strcat('normal','_',recordingLabel,'_',num2str(j));
-%                     imageName
-%                     saveas(gcf,imageName,'png')
-%                     cd ..
-%            end   
-    
-    end
-    
-    [groundTruthEnvolope] = plotGroundTruthEnvelope(allIndexStarts, allIndexEnds,Norig, Fs );
-    [homomorphicEnv, hiltbertEnv, WaveEnv,PSDEnv] = envelopeExtraction(filter_out, Fs);
-     
-    fileCount = fileCount+1;
-   
+            fileCount = fileCount+1
+            end
 end
 
     
