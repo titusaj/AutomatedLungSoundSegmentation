@@ -15,3 +15,5 @@ Day 5: Figuring out how to do the ground truth segmentation smoothing function t
 Day 6: Figured out the problem in how the mean energy was be calculated,working out how to fix this power represenation problem.
 
 Day 7: Working out how to create the network for processing the dataflow in the system.
+
+Day 8: Got the envolopes of intrest that go into the network, need to figure outthe insertion into the network today, go input as a 4 layer input.
