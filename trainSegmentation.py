@@ -19,6 +19,7 @@ import matplotlib.pyplot as plt
 import pylab
 pylab.show
 import numpy as np
+from numpy import genfromtxt
 import argparse
 import random
 import csv
@@ -45,34 +46,43 @@ BS = 4
 
 # initialize the data and labels
 print("[INFO] loading raw vectors in...")
-envelopeFiles = []
+hilbert = []
 labels = []
 
 print(args["dataset"])
 
-# define the paths
+# Envolope Directory loading
+fileCount = 0
 for filename in os.listdir(args["dataset"]):
 	if filename.endswith(".csv"):
-		with open(filename) as csv_file:
-			csv_reader = csv.reader(csv_file, delimiter=',')
-			line_count = 0
-			if line_count == 0:
-				
+
+		print(fileCount)
+		fileCount += 1
+		#Importing the raw csv data
+		rawCSVHilbert = np.genfromtxt(args["dataset"]+'/'+filename, delimiter='\n')
+		hilbert.append(rawCSVHilbert)
+
+data = np.array(hilbert)
 
 
-labelPath = sorted(list(paths.list_images(args["dataset"])))
-random.seed(42)
-random.shuffle(labelPath)
+# Label Directory loading
+fileCount = 0
+for filename in os.listdir(args["labels"]):
+	if filename.endswith(".csv"):
 
-# loop over the input envelopes
-for envelope in envelopePath:
-	# load the image, pre-process it, and store it in the data list
-	data.append(envelope)
+		print(fileCount)
+		fileCount += 1
+		#Importing the raw csv data
+		rawCSVLabels = np.genfromtxt(args["labels"]+'/'+filename, delimiter='\n')
+		labels.append(rawCSVLabels)
 
-# loop over the input images
-for label in labelPath:
-	# load the image, pre-process it, and store it in the data list
-	labels.append(label)
+target = np.array(labels)
+
+print(data.shape)
+print(target.shape)
+
+
+
 
 # scale the raw pixel intensities to the range [0, 1]
 #data = np.array(data, dtype="float") / 255.0
