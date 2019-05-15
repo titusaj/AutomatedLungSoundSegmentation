@@ -21,7 +21,7 @@ pylab.show
 import numpy as np
 import argparse
 import random
-import cv2
+import csv
 import os
 
 # construct the argument parse and parse the arguments
@@ -51,21 +51,18 @@ labels = []
 print(args["dataset"])
 
 # define the paths
-for r, d, f in os.walk(args["dataset"]):
-    for file in f:
-        if '.csv' in file:
-			print('got here')
-	        envelopeFiles.append(os.path.join(r, file))
-
-
-for f in envelopeFiles:
-    print(f)
+for filename in os.listdir(args["dataset"]):
+	if filename.endswith(".csv"):
+		with open(filename) as csv_file:
+			csv_reader = csv.reader(csv_file, delimiter=',')
+			line_count = 0
+			if line_count == 0:
+				
 
 
 labelPath = sorted(list(paths.list_images(args["dataset"])))
 random.seed(42)
 random.shuffle(labelPath)
-
 
 # loop over the input envelopes
 for envelope in envelopePath:

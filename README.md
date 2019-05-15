@@ -18,4 +18,6 @@ Day 7: Working out how to create the network for processing the dataflow in the 
 
 Day 8: Got the envolopes of intrest that go into the network, need to figure outthe insertion into the network today, go input as a 4 layer input.
 
-Day 9: Got the envolope model figured out where just create a symetrical unet model for input into the system. 
+Day 9: Got the envolope model figured out where just create a symetrical unet model for input into the system.
+
+Day 10: Starting out in the morning with trying to preprocess all the data arrays for insertion into the model.
