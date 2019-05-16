@@ -89,12 +89,18 @@ print(target.shape)
 # split into input (X) and output (Y) variables
 X = data
 Y = target
+#Reshaping the data
+X = np.expand_dims(X, axis=2) # reshape (training_size, 88200) to (569, 30, 1)
+print(X.shape)
+
+#Y = np.expand_dims(Y, axis=2) # reshape (training_size, 88200) to (569, 30, 1)
+#print(Y.shape)
+
 
 
 # fix random seed for reproducibility
 seed = 7
 np.random.seed(seed)
-
 
 # define 10-fold cross validation test harness
 kfold = StratifiedKFold(n_splits=3, shuffle=True, random_state=seed)
