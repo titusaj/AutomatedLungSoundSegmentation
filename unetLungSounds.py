@@ -17,14 +17,14 @@ def unetLungNet(): #This represents a 256 x1 x4 array that is input into the net
     input_shape=(882000,1)
     n_classes = 1
     model = Sequential()
-    model.add(Conv1D(nb_filter=512, filter_length=1, input_shape=input_shape))
-    model.add(Activation('relu'))
+    model.add(Conv1D(filters=64, kernel_size=3, activation='relu', input_shape=(882000,1)))
+    model.add(Conv1D(filters=64, kernel_size=3, activation='relu'))
+    model.add(Dropout(0.5))
+    model.add(MaxPooling1D(pool_size=2))
     model.add(Flatten())
-    model.add(Dropout(0.4))
-    model.add(Dense(2048, activation='relu'))
-    model.add(Dense(1024, activation='relu'))
-    model.add(Dense(n_classes))
-    model.add(Activation('softmax'))
+    model.add(Dense(100, activation='relu'))
+    model.add(Dense(882000, activation='softmax'))
+    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
 #    model.compile( loss='categorical_crossentropy', optimizer=keras.optimizers.SGD(), metrics=[keras.metrics.categorical_accuracy])
     '''

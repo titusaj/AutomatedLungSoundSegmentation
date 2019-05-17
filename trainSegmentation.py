@@ -119,4 +119,4 @@ callback = [EarlyStopping(monitor='val_loss', patience=2),
 	ModelCheckpoint(filepath='best_model.h5', monitor='val_loss', save_best_only=True)]
 # Fitting the model
 model.fit(X,Y,batch_size=BS,epochs=EPOCHS, verbose=1, callbacks = callback,
-	validation_data=None, steps_per_epoch=len(X) // BS)
+	validation_data=None)
