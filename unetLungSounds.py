@@ -23,7 +23,7 @@ def unetLungNet(): #This represents a 256 x1 x4 array that is input into the net
     model.add(MaxPooling1D(pool_size=2))
     model.add(Flatten())
     model.add(Dense(100, activation='relu'))
-    model.add(Dense(882000, activation='softmax'))
+    model.add(Dense(1, activation='softmax'))
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
 #    model.compile( loss='categorical_crossentropy', optimizer=keras.optimizers.SGD(), metrics=[keras.metrics.categorical_accuracy])
