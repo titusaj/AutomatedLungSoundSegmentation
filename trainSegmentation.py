@@ -96,8 +96,6 @@ print(X.shape)
 #Y = np.expand_dims(Y, axis=2) # reshape (training_size, 88200) to (569, 30, 1)
 #print(Y.shape)
 
-
-
 # fix random seed for reproducibility
 seed = 7
 np.random.seed(seed)

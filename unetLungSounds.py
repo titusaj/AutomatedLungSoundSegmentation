@@ -13,21 +13,22 @@ from keras import regularizers
 import keras.backend as K
 
 def unetLungNet(): #This represents a 256 x1 x4 array that is input into the network
-
+    '''
     input_shape=(882000,1)
     n_classes = 1
     model = Sequential()
-    model.add(Conv1D(filters=64, kernel_size=3, activation='relu', input_shape=(882000,1)))
-    model.add(Conv1D(filters=64, kernel_size=3, activation='relu'))
+    model.add(Conv1D(filters=8, kernel_size=3, activation='relu', input_shape=(882000,1)))
+    model.add(MaxPooling1D(pool_size=2))
+    model.add(Conv1D(filters=8, kernel_size=3, activation='relu'))
+    model.add(MaxPooling1D(pool_size=2))
     model.add(Dropout(0.5))
     model.add(MaxPooling1D(pool_size=2))
     model.add(Flatten())
     model.add(Dense(100, activation='relu'))
     model.add(Dense(882000, activation='softmax'))
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-
-#    model.compile( loss='categorical_crossentropy', optimizer=keras.optimizers.SGD(), metrics=[keras.metrics.categorical_accuracy])
     '''
+#    model.compile( loss='categorical_crossentropy', optimizer=keras.optimizers.SGD(), metrics=[keras.metrics.categorical_accuracy])
     model = Sequential()
     model.add(Conv1D(8, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal',input_shape=(882000,1)))
     model.add(Conv1D(8, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
@@ -70,7 +71,15 @@ def unetLungNet(): #This represents a 256 x1 x4 array that is input into the net
     model.add(Conv1D(8, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
     model.add(Conv1D(8, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
     model.add(Conv1D(8, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
+
     '''
+        model.add(Flatten())
+        model.add(Dense(100, activation='relu'))
+        model.add(Dense(882000, activation='softmax'))
+        model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+    '''
+
+
     model.summary()
 
     return model
