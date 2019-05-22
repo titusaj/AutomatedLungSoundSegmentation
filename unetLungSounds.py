@@ -25,7 +25,7 @@ def unetLungNet(): #This represents a 256 x1 x4 array that is input into the net
     model.add(MaxPooling1D(pool_size=2))
     model.add(Flatten())
     model.add(Dense(100, activation='relu'))
-    model.add(Dense(1, activation='softmax'))
+    model.add(Dense(882000, activation='softmax'))
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
     '''
 #    model.compile( loss='categorical_crossentropy', optimizer=keras.optimizers.SGD(), metrics=[keras.metrics.categorical_accuracy])
@@ -51,8 +51,11 @@ def unetLungNet(): #This represents a 256 x1 x4 array that is input into the net
     model.add(Conv1D(128, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
     model.add(Dropout(0.5))
 
-    model.add(Conv1D(64, 2, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(UpSampling1D(size = 2)))
-    model.add(concatenate([drop4,up6], axis = 3))
+
+    model.add(Conv1D(64, 2, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
+    model.add(UpSampling1D(size = 2))
+    '''
+    model.add(concatenate([drop4,up6], axis = 2))
     model.add(Conv1D(64, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
     model.add(Conv1D(64, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
 
@@ -71,13 +74,13 @@ def unetLungNet(): #This represents a 256 x1 x4 array that is input into the net
     model.add(Conv1D(8, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
     model.add(Conv1D(8, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
     model.add(Conv1D(8, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
+    '''
 
-    '''
-        model.add(Flatten())
-        model.add(Dense(100, activation='relu'))
-        model.add(Dense(882000, activation='softmax'))
-        model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-    '''
+    model.add(Flatten())
+    model.add(Dense(100, activation='relu'))
+    model.add(Dense(882000, activation='softmax'))
+    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+
 
 
     model.summary()
