@@ -109,6 +109,7 @@ cvscores = []
 print("COMPILING MODEL....")
 #Fit the model
 model = unetLungNet()
+model.summary()
 #Optomizer setting
 opt = Adam(lr=INIT_LR, decay=INIT_LR/(EPOCHS))
 model.compile(loss="binary_crossentropy", optimizer =opt, metrics=["accuracy"])
