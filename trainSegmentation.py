@@ -112,7 +112,8 @@ model = unetLungNet()
 model.summary()
 #Optomizer setting
 opt = Adam(lr=INIT_LR, decay=INIT_LR/(EPOCHS))
-model.compile(loss="binary_crossentropy", optimizer =opt, metrics=["accuracy"])
+model.compile(optimizer="adam", loss="binary_crossentropy", metrics=["acc"])
+#model.compile(loss="binary_crossentropy", optimizer =opt, metrics=["accuracy"])
 # Set callback functions to early stop traing and save the best model from training
 callback = [EarlyStopping(monitor='val_loss', patience=2),
 	ModelCheckpoint(filepath='best_model.h5', monitor='val_loss', save_best_only=True)]

@@ -41,7 +41,7 @@ def bottleneck(x, filters, kernel_size=(3), padding="same", strides=1):
 
 def unetLungNet(): #This represents a 256 x1 x4 array that is input into the network
     f = [8, 16, 32, 64,128]
-    inputs = keras.layers.Input((None, 882000))
+    inputs = keras.layers.Input((None,882000))
     print('got here 1')
     p0 = inputs
     c1, p1 = down_block(p0, f[0]) #128 -> 64
