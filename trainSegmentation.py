@@ -26,6 +26,7 @@ import csv
 import os
 
 from unetLungSounds import unetLungNet
+from tsinalis import tsinalis
 
 # construct the argument parse and parse the arguments
 ap = argparse.ArgumentParser()
@@ -108,7 +109,7 @@ cvscores = []
 #intialize the model
 print("COMPILING MODEL....")
 #Fit the model
-model = unetLungNet()
+model = tsinalis()
 model.summary()
 #Optomizer setting
 opt = Adam(lr=INIT_LR, decay=INIT_LR/(EPOCHS))
@@ -118,5 +119,4 @@ model.compile(optimizer="adam", loss="binary_crossentropy", metrics=["acc"])
 callback = [EarlyStopping(monitor='val_loss', patience=2),
 	ModelCheckpoint(filepath='best_model.h5', monitor='val_loss', save_best_only=True)]
 # Fitting the model
-model.fit(X,Y,batch_size=BS,epochs=EPOCHS, verbose=1, callbacks = callback,
-	validation_data=None)
+model.fit(X,Y,batch_size=BS,epochs=EPOCHS, verbose=1, callbacks = None, validation_data=None)

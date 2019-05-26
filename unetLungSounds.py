@@ -17,6 +17,7 @@ from keras import regularizers
 
 
 
+
 def down_block(x, filters, kernel_size=(3), padding="same", strides=1):
     c = keras.layers.Conv1D(filters, kernel_size, padding=padding, strides=strides, activation="relu")(x)
     c = keras.layers.Conv1D(filters, kernel_size, padding=padding, strides=strides, activation="relu")(c)
@@ -40,8 +41,8 @@ def bottleneck(x, filters, kernel_size=(3), padding="same", strides=1):
     return c
 
 def unetLungNet(): #This represents a 256 x1 x4 array that is input into the network
-    f = [8, 16, 32, 64,128]
-    inputs = keras.layers.Input((None,882000))
+    f = [4, 8, 16, 32,64]
+    inputs = keras.layers.Input((None,1))
     print('got here 1')
     p0 = inputs
     c1, p1 = down_block(p0, f[0]) #128 -> 64
@@ -58,6 +59,8 @@ def unetLungNet(): #This represents a 256 x1 x4 array that is input into the net
     u4 = up_block(u3, c1, f[0]) #64 -> 128
     print('got here 4')
 
+
+
     '''
     model.add(Flatten())
     model.add(Dense(100, activation='relu'))
@@ -67,7 +70,7 @@ def unetLungNet(): #This represents a 256 x1 x4 array that is input into the net
     '''
 
 
-    outputs = keras.layers.Dense(882000, activation='softmax')(u4)
+    outputs = keras.layers.Dense(882000, activation='softmax')(bn)
     #outputs = keras.layers.Conv1D(882000, padding="same", activation="sigmoid")(u4)
     model = keras.models.Model(inputs, outputs)
 
