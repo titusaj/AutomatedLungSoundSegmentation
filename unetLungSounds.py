@@ -14,10 +14,40 @@ from keras.layers import Conv1D, MaxPooling1D, UpSampling1D, Conv2D, MaxPooling2
 from keras.callbacks import ModelCheckpoint, LearningRateScheduler
 from keras import regularizers
 
+def unetLungNet():
+    model = Sequential()
+    
+    model.add(Conv1D(8, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal',input_shape=(882000,1)))
+    model.add(Conv1D(8, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
+    model.add(MaxPooling1D(pool_size=2))
+
+    model.add(Conv1D(16, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
+    model.add(Conv1D(16, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
+    model.add(MaxPooling1D(pool_size=2))
+
+    model.add(Conv1D(32, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
+    model.add(Conv1D(32, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
+    model.add(MaxPooling1D(pool_size=2))
+
+    model.add(Conv1D(64, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
+    model.add(Conv1D(64, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
+    model.add(MaxPooling1D(pool_size=2))
+
+    model.add(Conv1D(128, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
+    model.add(Conv1D(128, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
+    model.add(MaxPooling1D(pool_size=2))
+    model.add(Dropout(0.5))
+    model.add(MaxPooling1D(pool_size=2))
+    model.add(Flatten())
+    model.add(Dense(100, activation='relu'))
+    model.add(Dense(882000, activation='softmax'))
+    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+
+    return model
 
 
 
-
+'''
 def down_block(x, filters, kernel_size=(3), padding="same", strides=1):
     c = keras.layers.Conv1D(filters, kernel_size, padding=padding, strides=strides, activation="relu")(x)
     c = keras.layers.Conv1D(filters, kernel_size, padding=padding, strides=strides, activation="relu")(c)
@@ -61,23 +91,21 @@ def unetLungNet(): #This represents a 256 x1 x4 array that is input into the net
 
 
 
-    '''
+
     model.add(Flatten())
     model.add(Dense(100, activation='relu'))
     model.add(Dense(882000, activation='softmax'))
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
-    '''
 
-
-    outputs = keras.layers.Dense(882000, activation='softmax')(bn)
+    outputs = keras.layers.Dense(882000, activation='softmax')(c4)
     #outputs = keras.layers.Conv1D(882000, padding="same", activation="sigmoid")(u4)
     model = keras.models.Model(inputs, outputs)
 
     return model
 
 
-    '''
+
     #UpSampling Layers
     model = Sequential()
     model.add(Conv1D(8, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal',input_shape=(882000,1)))
@@ -124,4 +152,4 @@ def unetLungNet(): #This represents a 256 x1 x4 array that is input into the net
     model.add(Conv1D(8, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
     model.add(Conv1D(8, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
     model.add(Conv1D(8, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
-    '''
+'''
