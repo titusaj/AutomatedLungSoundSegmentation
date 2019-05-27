@@ -16,7 +16,7 @@ from keras import regularizers
 
 def unetLungNet():
     model = Sequential()
-    
+
     model.add(Conv1D(8, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal',input_shape=(882000,1)))
     model.add(Conv1D(8, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
     model.add(MaxPooling1D(pool_size=2))
@@ -38,6 +38,9 @@ def unetLungNet():
     model.add(MaxPooling1D(pool_size=2))
     model.add(Dropout(0.5))
     model.add(MaxPooling1D(pool_size=2))
+
+
+    
     model.add(Flatten())
     model.add(Dense(100, activation='relu'))
     model.add(Dense(882000, activation='softmax'))

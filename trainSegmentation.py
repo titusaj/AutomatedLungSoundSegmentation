@@ -119,3 +119,7 @@ callback = [EarlyStopping(monitor='val_loss', patience=2),
 	ModelCheckpoint(filepath='best_model.h5', monitor='val_loss', save_best_only=True)]
 # Fitting the model
 model.fit(X,Y,batch_size=BS,epochs=EPOCHS, verbose=1, callbacks = None, validation_data=None)
+
+# save the model to disk
+print("[INFO] serializing network...")
+model.save(args["model"]+str(kFoldCount))
