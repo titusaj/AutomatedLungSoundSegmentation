@@ -19,6 +19,10 @@ import matplotlib.pyplot as plt
 import pylab
 pylab.show
 import numpy as np
+#Condition to load npy with bug in keras
+old = np.load
+np.load = lambda *a,**k: old(*a, allow_pickle=True, **k)
+
 from numpy import genfromtxt
 import argparse
 import random
@@ -35,8 +39,6 @@ ap.add_argument("-l", "--labels", required=True,
 	help="path to input label vectors")
 ap.add_argument("-m", "--model", required=True,
 	help="path to output model")
-ap.add_argument("-p", "--plot", type=str, default="plot.png",
-	help="path to output loss/accuracy plot")
 args = vars(ap.parse_args())
 
 
@@ -44,7 +46,7 @@ args = vars(ap.parse_args())
 # and batch size
 EPOCHS = 128
 INIT_LR = 1e-3
-BS = 4
+BS = 8
 
 # initialize the data and labels
 
@@ -52,7 +54,7 @@ hilbert = []
 labels = []
 
 print(args["dataset"])
-
+'''
 # Envolope Directory loading
 print("[INFO] loading raw envolopes in...")
 fileCount = 0
@@ -63,10 +65,12 @@ for filename in os.listdir(args["dataset"]):
 		fileCount += 1
 		#Importing the raw csv data
 		rawCSVHilbert = np.loadtxt(args["dataset"]+'/'+filename)
-		hilbert.append(rawCSVHilbert)
+		print(rawCSVHilbert.size)
+		if rawCSVHilbert.size == 882000:
+			hilbert.append(rawCSVHilbert)
 
 data = np.array(hilbert)
-
+np.save('dataTest.npy', data)
 
 # Label Directory loading
 print("[INFO] loading raw labels in...")
@@ -78,17 +82,20 @@ for filename in os.listdir(args["labels"]):
 		fileCount += 1
 		#Importing the raw csv data
 		rawCSVLabels = np.loadtxt(args["labels"]+'/'+filename)
-		labels.append(rawCSVLabels)
+		print(rawCSVLabels.size)
+		if rawCSVLabels.size == 882000:
+			labels.append(rawCSVLabels)
 
 target = np.array(labels)
+np.save('targetTest.npy', target)
+'''
+X = np.load('dataTest.npy')
+Y = np.load('targetTest.npy')
 
-print(data.shape)
-print(target.shape)
+print(X.shape)
+print(Y.shape)
 
 
-# split into input (X) and output (Y) variables
-X = data
-Y = target
 #Reshaping the data
 X = np.expand_dims(X, axis=2) # reshape (training_size, 88200) to (569, 30, 1)
 print(X.shape)

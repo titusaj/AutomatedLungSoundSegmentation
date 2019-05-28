@@ -48,7 +48,19 @@ def unetLungNet():
     model.add(Conv1D(256, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
     model.add(MaxPooling1D(pool_size=2))
 
-    model.add(Dropout(0.5))
+    model.add(Conv1D(512, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
+    model.add(Conv1D(512, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
+    model.add(MaxPooling1D(pool_size=2))
+
+    model.add(Conv1D(1024, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
+    model.add(Conv1D(1024, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
+    model.add(MaxPooling1D(pool_size=2))
+
+    model.add(Conv1D(2048, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
+    model.add(Conv1D(2048, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
+    model.add(MaxPooling1D(pool_size=2))
+
+    model.add(Dropout(0.9))
     model.add(MaxPooling1D(pool_size=2))
 
     model.add(Flatten())

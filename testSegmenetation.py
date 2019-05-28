@@ -104,7 +104,3 @@ for vectorCount  in range(0,X.shape[0]):
 
     (segmentationProbs) = model.predict(testData)[0]
     segProbs.append(segmentationProbs)
-
-plt.plot(segProbs)
-plt.ylabel('some numbers')
-plt.show()
