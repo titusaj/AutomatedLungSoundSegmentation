@@ -45,16 +45,15 @@ args = vars(ap.parse_args())
 # initialize the number of epochs to train for, initial learning rate,
 # and batch size
 EPOCHS = 128
-INIT_LR = 1e-3
+INIT_LR = 1e-4
 BS = 8
 
 # initialize the data and labels
 
 hilbert = []
 labels = []
-
-print(args["dataset"])
 '''
+print(args["dataset"])
 # Envolope Directory loading
 print("[INFO] loading raw envolopes in...")
 fileCount = 0
@@ -70,7 +69,7 @@ for filename in os.listdir(args["dataset"]):
 			hilbert.append(rawCSVHilbert)
 
 data = np.array(hilbert)
-np.save('dataTest.npy', data)
+np.save('dTest.npy', data)
 
 # Label Directory loading
 print("[INFO] loading raw labels in...")
@@ -87,14 +86,10 @@ for filename in os.listdir(args["labels"]):
 			labels.append(rawCSVLabels)
 
 target = np.array(labels)
-np.save('targetTest.npy', target)
+np.save('tTest.npy', target)
 '''
-X = np.load('dataTest.npy')
-Y = np.load('targetTest.npy')
-
-print(X.shape)
-print(Y.shape)
-
+X = np.load('dataTraining.npy')
+Y = np.load('targetTraining.npy')
 
 #Reshaping the data
 X = np.expand_dims(X, axis=2) # reshape (training_size, 88200) to (569, 30, 1)
@@ -106,6 +101,11 @@ print(X.shape)
 # fix random seed for reproducibility
 seed = 7
 np.random.seed(seed)
+
+print('X Shape:',X.shape)
+print('Y Shape:',Y.shape)
+
+
 
 # define 10-fold cross validation test harness
 kfold = StratifiedKFold(n_splits=3, shuffle=True, random_state=seed)
@@ -119,7 +119,7 @@ model = unetLungNet()
 model.summary()
 #Optomizer setting
 opt = Adam(lr=INIT_LR, decay=INIT_LR/(EPOCHS))
-model.compile(optimizer="adam", loss="binary_crossentropy", metrics=["acc"])
+#model.compile(optimizer="adam", loss="categorical_crossentropy", metrics=["acc"])
 #model.compile(loss="binary_crossentropy", optimizer =opt, metrics=["accuracy"])
 # Set callback functions to early stop traing and save the best model from training
 callback = [EarlyStopping(monitor='val_loss', patience=2),

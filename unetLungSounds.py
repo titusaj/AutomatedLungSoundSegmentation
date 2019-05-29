@@ -20,53 +20,60 @@ from keras import regularizers
 def unetLungNet():
     model = Sequential()
 
+    #1a
     model.add(Conv1D(4, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal',input_shape=(882000,1)))
     model.add(Conv1D(4, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
     model.add(MaxPooling1D(pool_size=2))
 
+    #1b
     model.add(Conv1D(8, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
     model.add(Conv1D(8, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
     model.add(MaxPooling1D(pool_size=2))
-
+    #1c
+    model.add(Conv1D(16, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
+    model.add(Conv1D(16, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
+    model.add(MaxPooling1D(pool_size=2))
+    #2
+    model.add(Conv1D(16, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
+    model.add(Conv1D(16, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
+    model.add(MaxPooling1D(pool_size=2))
+    #3
+    model.add(Conv1D(16, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
+    model.add(Conv1D(16, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
+    model.add(MaxPooling1D(pool_size=2))
+    #4
+    model.add(Conv1D(16, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
+    model.add(Conv1D(16, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
+    model.add(MaxPooling1D(pool_size=2))
+    #5
+    model.add(Conv1D(16, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
+    model.add(Conv1D(16, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
+    model.add(MaxPooling1D(pool_size=2))
+    #6
+    model.add(Conv1D(16, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
+    model.add(Conv1D(16, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
+    model.add(MaxPooling1D(pool_size=2))
+    #7
+    model.add(Conv1D(16, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
+    model.add(Conv1D(16, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
+    model.add(MaxPooling1D(pool_size=2))
+    #8
     model.add(Conv1D(16, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
     model.add(Conv1D(16, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
     model.add(MaxPooling1D(pool_size=2))
 
-    model.add(Conv1D(32, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
-    model.add(Conv1D(32, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
+    #Dropout
+    model.add(Dropout(0.8))
     model.add(MaxPooling1D(pool_size=2))
 
-    model.add(Conv1D(64, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
-    model.add(Conv1D(64, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
-    model.add(MaxPooling1D(pool_size=2))
-
-    model.add(Conv1D(128, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
-    model.add(Conv1D(128, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
-    model.add(MaxPooling1D(pool_size=2))
-
-    model.add(Conv1D(256, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
-    model.add(Conv1D(256, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
-    model.add(MaxPooling1D(pool_size=2))
-
-    model.add(Conv1D(512, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
-    model.add(Conv1D(512, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
-    model.add(MaxPooling1D(pool_size=2))
-
-    model.add(Conv1D(1024, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
-    model.add(Conv1D(1024, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
-    model.add(MaxPooling1D(pool_size=2))
-
-    model.add(Conv1D(2048, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
-    model.add(Conv1D(2048, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
-    model.add(MaxPooling1D(pool_size=2))
-
-    model.add(Dropout(0.9))
-    model.add(MaxPooling1D(pool_size=2))
-
+    #Dense Layers
     model.add(Flatten())
     model.add(Dense(100, activation='relu'))
+    model.add(Dense(200, activation='relu'))
+    model.add(Dense(300, activation='relu'))
     model.add(Dense(882000, activation='softmax'))
-    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+
+    model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 
     return model
 

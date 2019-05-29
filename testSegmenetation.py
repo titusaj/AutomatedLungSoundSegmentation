@@ -103,4 +103,8 @@ for vectorCount  in range(0,X.shape[0]):
     print("Test data shape", testData.shape)
 
     (segmentationProbs) = model.predict(testData)[0]
+
     segProbs.append(segmentationProbs)
+
+
+np.save('segProbsTest', segProbs)
