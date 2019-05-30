@@ -31,8 +31,8 @@ import csv
 import os
 from scipy import signal, misc
 
-from unetLungSounds import unetLungNet
-
+#from unetLungSounds import unetLungNet
+from simpleModel import simpleModelNet
 # construct the argument parse and parse the arguments
 ap = argparse.ArgumentParser()
 ap.add_argument("-d", "--dataset", required=True,
@@ -118,7 +118,7 @@ cvscores = []
 #intialize the model
 print("COMPILING MODEL....")
 #Fit the model
-model = unetLungNet()
+model =simpleModelNet()
 model.summary()
 #Optomizer setting
 opt = Adam(lr=INIT_LR, decay=INIT_LR/(EPOCHS))
@@ -129,6 +129,7 @@ callback = [EarlyStopping(monitor='val_loss', patience=2),
 	ModelCheckpoint(filepath='best_model.h5', monitor='val_loss', save_best_only=True)]
 # Fitting the model
 model.fit(X,Y,batch_size=BS,epochs=EPOCHS, verbose=1, callbacks = None, validation_data=None)
+model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 
 # save the model to disk
 print("[INFO] serializing network...")

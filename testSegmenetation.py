@@ -29,9 +29,9 @@ ap.add_argument("-m", "--model", required=True,
 args = vars(ap.parse_args())
 # initialize the number of epochs to train for, initial learning rate,
 # and batch size
-EPOCHS = 1024
-INIT_LR = 1e-3
-BS = 4
+EPOCHS = 2048
+INIT_LR = 1e-4
+BS = 300
 
 # initialize the data and labels
 
@@ -87,9 +87,6 @@ fileEnds =[]
 
 segProbs= []
 
-
-
-
 # load the trained convolutional neural network
 print("[INFO] loading network...")
 model = load_model(args["model"])
@@ -102,10 +99,6 @@ for vectorCount  in range(0,X.shape[0]):
     testData = X[vectorCount,:,:]
     testData = testData.reshape(1,8820,1)
     print("Test data shape", testData.shape)
-
-    (segmentationProbs) = model.predict(testData)[0]
-
+    segmentationProbs = model.predict(testData)[0]
     segProbs.append(segmentationProbs)
-
-
 np.save('segProbsTest', segProbs)
