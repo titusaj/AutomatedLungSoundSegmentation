@@ -14,6 +14,7 @@ from sklearn.model_selection import StratifiedKFold
 from keras.callbacks import EarlyStopping, ModelCheckpoint
 import keras.backend as K
 
+
 from imutils import paths
 import matplotlib.pyplot as plt
 import pylab
@@ -28,6 +29,7 @@ import argparse
 import random
 import csv
 import os
+from scipy import signal, misc
 
 from unetLungSounds import unetLungNet
 
@@ -44,14 +46,17 @@ args = vars(ap.parse_args())
 
 # initialize the number of epochs to train for, initial learning rate,
 # and batch size
-EPOCHS = 128
+EPOCHS = 1024
 INIT_LR = 1e-4
-BS = 8
+BS = 300
 
 # initialize the data and labels
 
 hilbert = []
 labels = []
+
+resampledHilberts=[]
+resampledLabels = []
 '''
 print(args["dataset"])
 # Envolope Directory loading
@@ -65,11 +70,11 @@ for filename in os.listdir(args["dataset"]):
 		#Importing the raw csv data
 		rawCSVHilbert = np.loadtxt(args["dataset"]+'/'+filename)
 		print(rawCSVHilbert.size)
-		if rawCSVHilbert.size == 882000:
+		if rawCSVHilbert.size == 8820:
 			hilbert.append(rawCSVHilbert)
 
 data = np.array(hilbert)
-np.save('dTest.npy', data)
+np.save('dataTrain.npy', data)
 
 # Label Directory loading
 print("[INFO] loading raw labels in...")
@@ -82,14 +87,17 @@ for filename in os.listdir(args["labels"]):
 		#Importing the raw csv data
 		rawCSVLabels = np.loadtxt(args["labels"]+'/'+filename)
 		print(rawCSVLabels.size)
-		if rawCSVLabels.size == 882000:
+		if rawCSVLabels.size == 8820:
 			labels.append(rawCSVLabels)
 
 target = np.array(labels)
-np.save('tTest.npy', target)
+np.save('targetTrain.npy', target)
 '''
-X = np.load('dataTraining.npy')
-Y = np.load('targetTraining.npy')
+X = np.load('dataTrain.npy')
+Y = np.load('targetTrain.npy')
+
+print('X Shape:',X.shape)
+print('Y Shape:',Y.shape)
 
 #Reshaping the data
 X = np.expand_dims(X, axis=2) # reshape (training_size, 88200) to (569, 30, 1)
@@ -101,11 +109,6 @@ print(X.shape)
 # fix random seed for reproducibility
 seed = 7
 np.random.seed(seed)
-
-print('X Shape:',X.shape)
-print('Y Shape:',Y.shape)
-
-
 
 # define 10-fold cross validation test harness
 kfold = StratifiedKFold(n_splits=3, shuffle=True, random_state=seed)

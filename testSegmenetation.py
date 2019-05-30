@@ -29,7 +29,7 @@ ap.add_argument("-m", "--model", required=True,
 args = vars(ap.parse_args())
 # initialize the number of epochs to train for, initial learning rate,
 # and batch size
-EPOCHS = 128
+EPOCHS = 1024
 INIT_LR = 1e-3
 BS = 4
 
@@ -50,11 +50,12 @@ for filename in os.listdir(args["dataset"]):
 		fileCount += 1
 		#Importing the raw csv data
 		rawCSVHilbert = np.loadtxt(args["dataset"]+'/'+filename)
-		hilbert.append(rawCSVHilbert)
+		print(rawCSVHilbert.size)
+		if rawCSVHilbert.size == 8820:
+			hilbert.append(rawCSVHilbert)
 
 data = np.array(hilbert)
-
-print(data.shape)
+print("Data shape:", data.shape)
 
 
 
@@ -99,7 +100,7 @@ model.compile(loss="binary_crossentropy", optimizer=opt,
 
 for vectorCount  in range(0,X.shape[0]):
     testData = X[vectorCount,:,:]
-    testData = testData.reshape(1,882000,1)
+    testData = testData.reshape(1,8820,1)
     print("Test data shape", testData.shape)
 
     (segmentationProbs) = model.predict(testData)[0]
