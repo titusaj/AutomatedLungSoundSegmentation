@@ -4,11 +4,11 @@ import os
 
 import tensorflow as tf
 from tensorflow import keras
+from keras import Sequential
 
 
 import numpy as np
 from keras.preprocessing import sequence
-from keras.models import Sequential
 from keras.layers import Dense, Dropout, Activation
 from keras.layers import Embedding, Reshape
 from keras.layers import Conv1D, MaxPooling1D, UpSampling1D, Conv2D, MaxPooling2D, Flatten, Concatenate
@@ -71,8 +71,6 @@ def unetLungNet():
     model.add(Flatten())
     model.add(Dense(100, activation='relu',kernel_regularizer=regularizers.l2(0.01),
                 activity_regularizer=regularizers.l1(0.01)))
-    model.add(Dense(8820, activation='softmax'))
-
-    model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+    model.add(Dense(8820, activation='sigmoid'))
 
     return model
