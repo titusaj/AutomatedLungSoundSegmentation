@@ -29,9 +29,9 @@ ap.add_argument("-m", "--model", required=True,
 args = vars(ap.parse_args())
 # initialize the number of epochs to train for, initial learning rate,
 # and batch size
-EPOCHS = 2048
+EPOCHS = 4096
 INIT_LR = 1e-4
-BS = 300
+BS = 100
 
 # initialize the data and labels
 
@@ -97,7 +97,7 @@ model.compile(loss="binary_crossentropy", optimizer=opt,
 
 for vectorCount  in range(0,X.shape[0]):
     testData = X[vectorCount,:,:]
-    testData = testData.reshape(1,8820,1)
+    testData = testData.reshape(1,4000,1)
     print("Test data shape", testData.shape)
     segmentationProbs = model.predict(testData)[0]
     segProbs.append(segmentationProbs)

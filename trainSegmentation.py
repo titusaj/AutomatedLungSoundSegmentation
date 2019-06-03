@@ -46,9 +46,9 @@ args = vars(ap.parse_args())
 
 # initialize the number of epochs to train for, initial learning rate,
 # and batch size
-EPOCHS = 1024
+EPOCHS = 4096
 INIT_LR = 1e-4
-BS = 300
+BS = 100
 
 # initialize the data and labels
 
@@ -70,7 +70,7 @@ for filename in os.listdir(args["dataset"]):
 		#Importing the raw csv data
 		rawCSVHilbert = np.loadtxt(args["dataset"]+'/'+filename)
 		print(rawCSVHilbert.size)
-		if rawCSVHilbert.size == 8820:
+		if rawCSVHilbert.size == 4000:
 			hilbert.append(rawCSVHilbert)
 
 data = np.array(hilbert)
@@ -87,7 +87,7 @@ for filename in os.listdir(args["labels"]):
 		#Importing the raw csv data
 		rawCSVLabels = np.loadtxt(args["labels"]+'/'+filename)
 		print(rawCSVLabels.size)
-		if rawCSVLabels.size == 8820:
+		if rawCSVLabels.size == 4000:
 			labels.append(rawCSVLabels)
 
 target = np.array(labels)
@@ -103,8 +103,9 @@ print('Y Shape:',Y.shape)
 X = np.expand_dims(X, axis=2) # reshape (training_size, 88200) to (569, 30, 1)
 print(X.shape)
 
-#Y = np.expand_dims(Y, axis=2) # reshape (training_size, 88200) to (569, 30, 1)
-#print(Y.shape)
+
+Y = np.expand_dims(Y, axis=2) # reshape (training_size, 88200) to (569, 30, 1)
+print(Y.shape)
 
 # fix random seed for reproducibility
 seed = 7
@@ -120,11 +121,11 @@ print("COMPILING MODEL....")
 #Fit the model
 model =unetLungNet()
 model.summary()
-model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+#model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 #Optomizer setting
 opt = Adam(lr=INIT_LR, decay=INIT_LR/(EPOCHS))
 #model.compile(optimizer="adam", loss="categorical_crossentropy", metrics=["acc"])
-#model.compile(loss="binary_crossentropy", optimizer =opt, metrics=["accuracy"])
+model.compile(loss="binary_crossentropy", optimizer =opt, metrics=["accuracy"])
 # Set callback functions to early stop traing and save the best model from training
 callback = [EarlyStopping(monitor='val_loss', patience=2),
 	ModelCheckpoint(filepath='best_model.h5', monitor='val_loss', save_best_only=True)]

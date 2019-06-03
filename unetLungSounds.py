@@ -2,75 +2,84 @@ import numpy as np
 import os
 
 
-import tensorflow as tf
-from tensorflow import keras
-from keras import Sequential
-
-
 import numpy as np
-from keras.preprocessing import sequence
-from keras.layers import Dense, Dropout, Activation
-from keras.layers import Embedding, Reshape
-from keras.layers import Conv1D, MaxPooling1D, UpSampling1D, Conv2D, MaxPooling2D, Flatten, Concatenate
+from keras.models import *
+from keras.layers import *
+from keras.optimizers import *
 from keras.callbacks import ModelCheckpoint, LearningRateScheduler
-from keras import regularizers
+from keras import backend as keras
+from keras.backend import transpose
+
+
+smooth = 1.
+
 
 
 
 def unetLungNet():
     model = Sequential()
 
-    #1a
-    model.add(Conv1D(4, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal',input_shape=(8820,1)))
-    model.add(Conv1D(4, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
-    model.add(MaxPooling1D(pool_size=2))
+    inputs = Input(shape=(4000,1))
 
-    #1b
-    model.add(Conv1D(8, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
-    model.add(Conv1D(8, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
-    model.add(MaxPooling1D(pool_size=2))
-    #1c
-    model.add(Conv1D(16, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
-    model.add(Conv1D(16, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
-    model.add(MaxPooling1D(pool_size=2))
-    #2
-    model.add(Conv1D(128, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
-    model.add(Conv1D(128, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
-    model.add(MaxPooling1D(pool_size=2))
-    #3
-    model.add(Conv1D(256, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
-    model.add(Conv1D(256, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
-    model.add(MaxPooling1D(pool_size=2))
-    #4
-    model.add(Conv1D(512, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
-    model.add(Conv1D(512, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
-    model.add(MaxPooling1D(pool_size=2))
-    #5
-    model.add(Conv1D(1024, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
-    model.add(Conv1D(16, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
-    model.add(MaxPooling1D(pool_size=2))
-    #6
-    model.add(Conv1D(1024, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
-    model.add(Conv1D(1024, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
-    model.add(MaxPooling1D(pool_size=2))
-    #7
-    model.add(Conv1D(2048, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
-    model.add(Conv1D(2048, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
-    model.add(MaxPooling1D(pool_size=2))
-    #8
-    model.add(Conv1D(4096, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
-    model.add(Conv1D(4096, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))
-    model.add(MaxPooling1D(pool_size=2))
+    conv1 = Conv1D(8, 3, activation='relu', padding='same')(inputs)
+    conv1 = Conv1D(8, 3, activation='relu', padding='same')(conv1)
+    pool1 = MaxPooling1D(pool_size=2)(conv1)
 
+    conv2 = Conv1D(16, 3, activation='relu', padding='same')(pool1)
+    conv2 = Conv1D(16, 3, activation='relu', padding='same')(conv2)
+    pool2 = MaxPooling1D(pool_size=2)(conv2)
 
-    #Dropout
-    model.add(Dropout(0.4))
-    model.add(MaxPooling1D(pool_size=2))
+    conv3 = Conv1D(32, 3, activation='relu', padding='same')(pool2)
+    conv3 = Conv1D(32, 3, activation='relu', padding='same')(conv3)
+    pool3 = MaxPooling1D(pool_size=2)(conv3)
 
-    #Dense Layers
-    model.add(Flatten())
-    model.add(Dense(100, activation='relu',kernel_regularizer=regularizers.l2(0.01),
-                activity_regularizer=regularizers.l1(0.01)))
-    model.add(Dense(8820, activation='sigmoid'))
+    conv4 = Conv1D(64, 3, activation='relu', padding='same')(pool3)
+    conv4 = Conv1D(64, 3, activation='relu', padding='same')(conv4)
+    pool4 = MaxPooling1D(pool_size=2)(conv4)
+
+    conv5 = Conv1D(128, 3, activation='relu', padding='same')(pool4)
+    conv5 = Conv1D(128, 3, activation='relu', padding='same')(conv5)
+    print("Conv5")
+    print(conv5.shape)
+    print("Conv4")
+    print(conv4.shape)
+
+    up_conv5 = UpSampling1D(size = 2) (conv5)
+
+    print("UpSampling1d")
+    print(up_conv5.shape)
+
+    up6 = concatenate([UpSampling1D(size=2)(conv5), conv4], axis=2)
+
+    conv6 = Conv1D(64, 3, activation='relu', padding='same')(up6)
+    conv6 = Conv1D(64, 3, activation='relu', padding='same')(conv6)
+
+    up7 = concatenate([UpSampling1D(size=2)(conv6), conv3], axis=2)
+
+    conv7 = Conv1D(32, 3, activation='relu', padding='same')(up7)
+    conv7 = Conv1D(32, 3, activation='relu', padding='same')(conv7)
+
+    up8 = concatenate([UpSampling1D(size=2)(conv7), conv2], axis=2)
+
+    conv8 = Conv1D(16, 3, activation='relu', padding='same')(up8)
+    conv8 = Conv1D(16, 3, activation='relu', padding='same')(conv8)
+
+    up9 = concatenate([UpSampling1D(size=2)(conv8), conv1], axis=2)
+
+    conv9 = Conv1D(8, 3, activation='relu', padding='same')(up9)
+    conv9 = Conv1D(8, 3, activation='sigmoid', padding='same')(conv9)
+
+    conv10 = Conv1D(1,1, activation='sigmoid')(conv9)
+
+    model = Model(inputs=[inputs], outputs=[conv10])
+
+    #model.compile(optimizer=Adam(lr=1e-5), loss=dice_coef_loss, metrics=[dice_coef])
 
     return model
+
+
+    #model.compile(optimizer = Adam(lr = 1e-4), loss = 'binary_crossentropy', metrics = ['accuracy'])
+
+    #model.summary()
+
+    #return model
