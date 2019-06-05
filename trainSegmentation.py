@@ -104,7 +104,7 @@ X = np.expand_dims(X, axis=2) # reshape (training_size, 88200) to (569, 30, 1)
 print(X.shape)
 
 
-Y = np.expand_dims(Y, axis=2) # reshape (training_size, 88200) to (569, 30, 1)
+Y = np.expand_dims(Y, axis=2) # reshape (training_size, 88200)
 print(Y.shape)
 
 # fix random seed for reproducibility

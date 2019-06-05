@@ -29,9 +29,9 @@ ap.add_argument("-m", "--model", required=True,
 args = vars(ap.parse_args())
 # initialize the number of epochs to train for, initial learning rate,
 # and batch size
-EPOCHS = 4096
+EPOCHS = 100000
 INIT_LR = 1e-4
-BS = 100
+BS = 4000
 
 # initialize the data and labels
 
@@ -51,7 +51,7 @@ for filename in os.listdir(args["dataset"]):
 		#Importing the raw csv data
 		rawCSVHilbert = np.loadtxt(args["dataset"]+'/'+filename)
 		print(rawCSVHilbert.size)
-		if rawCSVHilbert.size == 8820:
+		if rawCSVHilbert.size == 4000:
 			hilbert.append(rawCSVHilbert)
 
 data = np.array(hilbert)
