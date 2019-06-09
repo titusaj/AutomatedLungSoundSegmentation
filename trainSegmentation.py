@@ -12,6 +12,7 @@ from keras.preprocessing.image import img_to_array
 from keras.utils import to_categorical
 from sklearn.model_selection import StratifiedKFold
 from keras.callbacks import EarlyStopping, ModelCheckpoint
+import keras.backend as K
 
 
 from imutils import paths
@@ -19,11 +20,18 @@ import matplotlib.pyplot as plt
 import pylab
 pylab.show
 import numpy as np
+#Condition to load npy with bug in keras
+old = np.load
+np.load = lambda *a,**k: old(*a, allow_pickle=True, **k)
+
 from numpy import genfromtxt
 import argparse
 import random
 import csv
 import os
+from scipy import signal, misc
+
+from unetLungSounds import unetLungNet
 
 # construct the argument parse and parse the arguments
 ap = argparse.ArgumentParser()
@@ -33,25 +41,26 @@ ap.add_argument("-l", "--labels", required=True,
 	help="path to input label vectors")
 ap.add_argument("-m", "--model", required=True,
 	help="path to output model")
-ap.add_argument("-p", "--plot", type=str, default="plot.png",
-	help="path to output loss/accuracy plot")
 args = vars(ap.parse_args())
 
 
 # initialize the number of epochs to train for, initial learning rate,
 # and batch size
-EPOCHS = 128
-INIT_LR = 1e-3
-BS = 4
+EPOCHS = 100000
+INIT_LR = 1e-4
+BS = 400
 
 # initialize the data and labels
-print("[INFO] loading raw vectors in...")
+
 hilbert = []
 labels = []
 
+resampledHilberts=[]
+resampledLabels = []
+'''
 print(args["dataset"])
-
 # Envolope Directory loading
+print("[INFO] loading raw envolopes in...")
 fileCount = 0
 for filename in os.listdir(args["dataset"]):
 	if filename.endswith(".csv"):
@@ -59,13 +68,16 @@ for filename in os.listdir(args["dataset"]):
 		print(fileCount)
 		fileCount += 1
 		#Importing the raw csv data
-		rawCSVHilbert = np.genfromtxt(args["dataset"]+'/'+filename, delimiter='\n')
-		hilbert.append(rawCSVHilbert)
+		rawCSVHilbert = np.loadtxt(args["dataset"]+'/'+filename)
+		print(rawCSVHilbert.size)
+		if rawCSVHilbert.size == 4000:
+			hilbert.append(rawCSVHilbert)
 
 data = np.array(hilbert)
-
+np.save('dataTrain.npy', data)
 
 # Label Directory loading
+print("[INFO] loading raw labels in...")
 fileCount = 0
 for filename in os.listdir(args["labels"]):
 	if filename.endswith(".csv"):
@@ -73,98 +85,53 @@ for filename in os.listdir(args["labels"]):
 		print(fileCount)
 		fileCount += 1
 		#Importing the raw csv data
-		rawCSVLabels = np.genfromtxt(args["labels"]+'/'+filename, delimiter='\n')
-		labels.append(rawCSVLabels)
+		rawCSVLabels = np.loadtxt(args["labels"]+'/'+filename)
+		print(rawCSVLabels.size)
+		if rawCSVLabels.size == 4000:
+			labels.append(rawCSVLabels)
 
 target = np.array(labels)
+np.save('targetTrain.npy', target)
+'''
+X = np.load('dataTrain.npy')
+Y = np.load('targetTrain.npy')
 
-print(data.shape)
-print(target.shape)
+print('X Shape:',X.shape)
+print('Y Shape:',Y.shape)
+
+#Reshaping the data
+X = np.expand_dims(X, axis=2) # reshape (training_size, 88200) to (569, 30, 1)
+print(X.shape)
 
 
-
-
-# scale the raw pixel intensities to the range [0, 1]
-#data = np.array(data, dtype="float") / 255.0
-#labels = np.array(labels)
-
-print data.shape
-print labels.shape
-
-# split into input (X) and output (Y) variables
-X = data
-Y = labels
-
+Y = np.expand_dims(Y, axis=2) # reshape (training_size, 88200)
+print(Y.shape)
 
 # fix random seed for reproducibility
 seed = 7
 np.random.seed(seed)
 
 # define 10-fold cross validation test harness
-kfold = StratifiedKFold(n_splits=10, shuffle=True, random_state=seed)
+kfold = StratifiedKFold(n_splits=3, shuffle=True, random_state=seed)
 kFoldCount = 1
 cvscores = []
 
-#Open log file
-f = open("logFile.txt", "a")
+#intialize the model
+print("COMPILING MODEL....")
+#Fit the model
+model =unetLungNet()
+model.summary()
+#model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+#Optomizer setting
+opt = Adam(lr=INIT_LR, decay=INIT_LR/(EPOCHS))
+#model.compile(optimizer="adam", loss="categorical_crossentropy", metrics=["acc"])
+model.compile(loss="binary_crossentropy", optimizer =opt, metrics=["accuracy"])
+# Set callback functions to early stop traing and save the best model from training
+callback = [EarlyStopping(monitor='val_loss', patience=2),
+	ModelCheckpoint(filepath='best_model.h5', monitor='val_loss', save_best_only=True)]
+# Fitting the model
+model.fit(X,Y,batch_size=BS,epochs=EPOCHS, verbose=1, callbacks = None, validation_data=None)
 
-
-for train, test in kfold.split(X, Y):
-	# initialize the model
-	print("[INFO] compiling model...")
-	#model = LeNet.build(img_width, img_height, depth=3, classes=2)
-	model = LeNet(reduction=0.5, classes=2)
-	#model = VGG_16(classes=2)
-	opt = Adam(lr=INIT_LR, decay=INIT_LR / (EPOCHS))
-	model.compile(loss="binary_crossentropy", optimizer=opt, metrics=["accuracy"])
-
-
-	Z = to_categorical(Y, num_classes=2)
-
-
- 	print train.shape
-	print test.shape
-
-	print X[train].shape
-	print Z[train].shape
-
-	# Set callback functions to early stop training and save the best model so far
-	callbacks = [EarlyStopping(monitor='val_loss', patience=2),ModelCheckpoint(filepath='best_model.h5', monitor='val_loss', save_best_only=True)]
-
-	# Fit the model
-	print("[INFO] training network...")
-	model.fit(X[train], Z[train],epochs= EPOCHS, batch_size=BS, verbose = 1)
-	#H = model.fit_generator(aug.flow(X[train], Z[train], batch_size=BS),
-	#	validation_data=None, steps_per_epoch=len(X[train]) // BS,
-	#	epochs=EPOCHS, verbose=1)
-
-	# save the model to disk
-	print("[INFO] serializing network...")
-	model.save(args["model"]+str(kFoldCount))
-	kFoldCount = kFoldCount + 1
-
-	# evaluate the model
-	scores = model.evaluate(X[test], Z[test], verbose=0)
-	print("%s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
-	f.write("%s: %.2f%%\n" % (model.metrics_names[1], scores[1]*100))
-	#f.write("%s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
-	cvscores.append(scores[1] * 100)
-
-
-print("%.2f%% (+/- %.2f%%)" % (np.mean(cvscores), np.std(cvscores)))
-f.write("%.2f%% (+/- %.2f%%)\n" % (np.mean(cvscores), np.std(cvscores)))
-
-
-	# plot the training loss and accuracy
-	#plt.style.use("ggplot")
-	#plt.figure()
-	#N = EPOCHS
-	#plt.plot(np.arange(0, N), H.history["loss"], label="train_loss")
-	#plt.plot(np.arange(0, N), H.history["val_loss"], label="val_loss")
-	#plt.plot(np.arange(0, N), H.history["acc"], label="train_acc")
-	#plt.plot(np.arange(0, N), H.history["val_acc"], label="val_acc")
-	#plt.title("Training Loss and Accuracy on Wheeze/Not Wheeze")
-	#plt.xlabel("Epoch #")
-	#plt.ylabel("Loss/Accuracy")
-	#plt.legend(loc="lower left")
-	#plt.savefig(args["plot"])
+# save the model to disk
+print("[INFO] serializing network...")
+model.save(args["model"]+str(kFoldCount))

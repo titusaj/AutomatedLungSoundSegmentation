@@ -21,3 +21,7 @@ Day 8: Got the envolopes of intrest that go into the network, need to figure out
 Day 9: Got the envolope model figured out where just create a symetrical unet model for input into the system.
 
 Day 10: Starting out in the morning with trying to preprocess all the data arrays for insertion into the model.
+
+Day 11: Pausing unet implementation for right now having trouble with the memory allocation working out how to get the model workinng with out this.
+
+Day 12: Got the test paradigm working out now and getting the expected overfit result, now got to work out why the output for this model is so big.
