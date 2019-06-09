@@ -4,7 +4,7 @@
 % This function takes the filtered signal and gives out the the diffrent
 % envolopes of matching length.
 
-function [hiltbertEnv] = envelopeExtraction(filteredSignal, Fs)
+function [hilbertEnv] = envelopeExtraction(filteredSignal, Fs)
 
 % %%  Homomorphic 
 %     lpf_frequency = 80;
@@ -12,7 +12,7 @@ function [hiltbertEnv] = envelopeExtraction(filteredSignal, Fs)
 %     
 
 %% Hilbert
-    hiltbertEnv = abs(hilbert(filteredSignal));
+    hilbertEnv = abs(hilbert(filteredSignal));
 
 % %% Wavelet
 %     win_time = 40/1000; % sec
@@ -20,7 +20,6 @@ function [hiltbertEnv] = envelopeExtraction(filteredSignal, Fs)
 %     time_interval = win_time * overlap_per; % sec
 %     window = round(Fs*win_time);
 %     noverlap = round(window*overlap_per);
-%     F = 2048*2;
 % 
 %     [s,w,t] = spectrogram(filteredSignal,window,noverlap,Fs/2,Fs,'yaxis');
 % 
@@ -28,8 +27,8 @@ function [hiltbertEnv] = envelopeExtraction(filteredSignal, Fs)
 %      
 %         bandPower = []; 
 %         bandEnergy = []; 
-%         fh = 1000;
-%         fl = 80;
+%         fh = 25;
+%         fl = 0;
 % 
 %          for k = 1:length(s(1,:))
 % 
@@ -48,5 +47,22 @@ function [hiltbertEnv] = envelopeExtraction(filteredSignal, Fs)
 %     N = length(filteredSignal);
 %     filteredSignal_dft = fft(filteredSignal);
 %     PSDEnv= (1/(2*pi*N)) * abs(filteredSignal_dft).^2;
+%     
+% %% Plot the results
+% figure
+% subplot(4,1,1)
+% plot(filteredSignal)
+% title('Raw Signal')
+% subplot(4,1,2)
+% plot(hilbertEnv)
+% title('Hilbert')
+% subplot(4,1,3)
+% plot(WaveEnv)
+% title('WaveEnv')
+% subplot(4,1,4)
+% plot(PSDEnv)
+% title('PSDEnv')
+
+
 
 end
