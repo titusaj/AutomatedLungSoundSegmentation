@@ -18,6 +18,9 @@ wheezeCount = 1;
 Signals = {};
 
 
+
+
+
 for i = 4:2:length(files)
 
             cycleStart = [];
@@ -28,109 +31,148 @@ for i = 4:2:length(files)
             cycleCount = 0;
             
 
-            textFilename = files(i).name;
-            wavFilename = files(i+1).name;
+            
+            wavFilename = files(i).name;
 
-            temp = strsplit(textFilename,'.');
+            temp = strsplit(wavFilename,'.');
             recordingLabel = temp{1};
             
             
             temp2 = strsplit(temp{1},'_');
             hardware = temp2{5};
 
-            patientNum = textFilename(1:3);
+            patientNum = wavFilename(1:3);
+            
+            tempTextFilename = strcat(temp{1},'_events.txt');
+            
+            if isfile(tempTextFilename)
 
+            textFilename = files(i+1).name;
+            
+            %% This is for reading the segmenetation events
+%             audioLabelData =  textread(textFilename); %Read the text file into workspace
+% 
+%             cycleStart = audioLabelData(:,1); 
+%             cycleEnd = audioLabelData(:,2);
+%             cracklePresent = audioLabelData(:,3);
+%             wheezePresent = audioLabelData(:,4);
+%             numCycles = length(cycleStart);
 
-            audioLabelData =  textread(textFilename); %Read the text file into workspace
-
-            cycleStart = audioLabelData(:,1); 
-            cycleEnd = audioLabelData(:,2);
-            cracklePresent = audioLabelData(:,3);
-            wheezePresent = audioLabelData(:,4);
-            numCycles = length(cycleStart);
-
-            [rawWholeSignal,Fs] = audioread(wavFilename ); %Read the signal in if applicable
+            [rawWholeSignal,ogFs] = audioread(wavFilename ); %Read the signal in if applicable
         
             
             allIndexStarts = [];
+     
             
-          %  if Fs == 44100
+           %% This is for reading the segmenetation events
+           fileID = fopen(textFilename);
+           x = fscanf(fileID,'%f %f %s');
+           fclose(fileID);
+           
+           
+%            tempEventCount = 0;
+%            wheezeEventCounts = 0;
+%            eventStarts = [];
+%            eventEnds = [];
+%          
+%            
+%             for eventCount= 1:length(x)
+%                if x(eventCount) == 119.0000 % This represent the ascII for wheeze start 
+%                     
+%                     tempEventCount = tempEventCount +1;
+%                     wheezeEventCounts = wheezeEventCounts + 1;
+%                     
+%                     eventStarts(tempEventCount ) = x(eventCount-2);
+%                     eventEnds(tempEventCount) = x(eventCount-1);
+%                 end  
+%             end
+         
+            
+            %% This is to pick of the normal segments
+            if isempty(x) 
+               dt = 1/ogFs;
+               Norig = length(rawWholeSignal);
+               rawTime = 0:dt:(Norig*dt)-dt;
+               
+               normalWindow = .65; % this should be in msec
+               eventStarts = 0:.65:rawTime(end);
+               
+               
+                     for j = 1:(length(eventStarts)-1)
+                                
+                               [d, indexStart] = min(abs( rawTime-round(eventStarts(j),3)));
+                               eventSignal = rawWholeSignal(indexStart:indexStart+(ogFs*.65)); % .65 sec represents the window size
+                               [filter_out] = plotWaveCoeff(eventSignal,ogFs);
+                               Fs = 4000;
+                                       if length(filter_out) > 128
+                                           spectrogram(filter_out,128,120,128,Fs,'yaxis')
 
-                    for j = 1:numCycles
+                                           imageName = strcat('normal_',hardware,'_',num2str(normalCount));
 
-                        cycleCount = cycleCount+1;
-                    
-                            if strcmp(hardware,'Litt3200') ||strcmp(hardware,'Meditron')
-                            if cracklePresent(j) == 0 &&  wheezePresent(j) == 0           
-                                    %time make up 
-                                    dt = 1/Fs;
-                                    Norig = length(rawWholeSignal);
-                                    rawTime = 0:dt:(Norig*dt)-dt;
+                                           %imagesc(t,period, abs(wt));
+                                           set(gca,'XTick',[]) % Remove the ticks in the x axis!
+                                           set(gca,'YTick',[]) % Remove the ticks in the y axis
+                                           set(gca,'Position',[0 0 1 1]) % Make the axes occupy the hole figure
 
-
-                                    [d, indexStart] = min( abs( rawTime-round(cycleStart(j),3) ));
-                                    [d, indexEnd ] = min( abs( rawTime-round(cycleEnd(j),3) ));                    
-                                    groundTruthSegmentedSignal = rawWholeSignal(indexStart:indexEnd);
-                                    
-                                    
-                                    %[cd1_filter_out] = plotWaveCoeff(groundTruthSegmentedSignal, Fs);
-                                    allIndexStarts(cycleCount) = indexStart;
-                                    allIndexEnds(cycleCount)  = indexEnd;
-                                    
-                                   % figure(1)
-                                    %plot(cd1_filter_out)
-
-
-
-                %                 Signals.data{crackleCount} = groundTruthSegmentedSignal;
-                %                 Signals.Fs{cracklelCount} = Fs;        
-                                   normalCount= normalCount +1; 
-                                    
-                                    [filter_out] = plotWaveCoeff( groundTruthSegmentedSignal,Fs);
-                                    
-                                    %%%%%%% Here signal Remsamples
-                                    Fs = 4000
-                                    
-                   
-                                   spectrogram(filter_out,128,120,128,Fs,'yaxis')
-
-                                     
-%                                      dt = 1/Fs;
-%                                      Norig = Fs;
-%                                      t = 0:dt:(Norig*dt)-dt;
-
-                                  
-                                     imageName = strcat('normal_',hardware,'_',num2str(normalCount));
-
-                                     %imagesc(t,period, abs(wt));
-                                     set(gca,'XTick',[]) % Remove the ticks in the x axis!
-                                     set(gca,'YTick',[]) % Remove the ticks in the y axis
-                                     set(gca,'Position',[0 0 1 1]) % Make the axes occupy the hole figure
-                                     
-                                     %Save figure
-                                     cd('CWTNormImages/')
-                                     saveas(gcf,imageName,'png') 
-                                     cd ..
-                                   
-
-%                                     win_time = 40/1000; % sec
-%                                     overlap_per = 0.5;
-%                                     time_interval = win_time * overlap_per; % sec
-%                                     window = round(Fs*win_time);
-%                                     noverlap = round(window*overlap_per);
-%                                     F = 2048*2;
+                                           %Save figure
+                                           cd('CWTNormImages/')
+                                           saveas(gcf,imageName,'png')
+                                           cd ..
+                                           
+                                           normalCount= normalCount +1;
+                                       end
+                       end
+             end
+            %% This is to pick of the wheeze segments
+%                     for j = 1:wheezeEventCounts %numCycles changing to events as opposed to segemented ccycles
 % 
-%                                     Fs;
-%                                     wn= (25*2) /Fs;
-%                                     n=6;
-%                                     [b,a] = butter(n,wn,'low');
+%                         cycleCount = cycleCount+1;
+%                     
+%                           % if strcmp(hardware,'Meditron') %|| strcmp(hardware,'Litt3200')
+%                           %  if cracklePresent(j) == 0 &&  wheezePresent(j) == 0           
+%                                     %time make up 
+%                                     dt = 1/ogFs;
+%                                     Norig = length(rawWholeSignal);
+%                                     rawTime = 0:dt:(Norig*dt)-dt;
 % 
-%                                     filter_out= filtfilt(b,a,rawWholeSignal);
-%                                     filter_out = filter_out/max(abs(filter_out));   
-                            end
-                            end
-
-                    end
+% 
+%                                     [d, indexStart] = min(abs( rawTime-round(eventStarts(j),3)));
+%                                     [d, indexEnd ] = min(abs( rawTime-round(eventEnds(j),3)));                    
+%                                     %groundTruthSegmentedSignal = rawWholeSignal(indexStart:indexEnd);
+%                                     eventSignal = rawWholeSignal(indexStart:indexEnd);
+%                                     
+%                                     %[cd1_filter_out] = plotWaveCoeff(groundTruthSegmentedSignal, Fs);
+%                                     allIndexStarts(cycleCount) = indexStart;
+%                                     allIndexEnds(cycleCount)  = indexEnd;
+%                                     
+%                                    normalCount= normalCount +1; 
+%                                     
+%                                     [filter_out] = plotWaveCoeff(eventSignal,ogFs);
+%                                     
+%                                     %%%%%%% Here signal Remsamples
+%                                     Fs = 4000;
+%                                     
+% 
+%                                     if length(filter_out) > 128
+%                                                                      spectrogram(filter_out,128,120,128,Fs,'yaxis')
+% 
+% 
+%                                                                          imageName = strcat('wheeze_',hardware,'_',num2str(normalCount));
+% 
+%                                                                          %imagesc(t,period, abs(wt));
+%                                                                          set(gca,'XTick',[]) % Remove the ticks in the x axis!
+%                                                                          set(gca,'YTick',[]) % Remove the ticks in the y axis
+%                                                                          set(gca,'Position',[0 0 1 1]) % Make the axes occupy the hole figure
+% 
+%                                                                          %Save figure
+%                                                                          cd('CWTWheezeImages/')
+%                                                                          saveas(gcf,imageName,'png') 
+%                                                                          cd ..
+%                                                      %           end
+%                                                      %          end
+%                                     end
+%                             end
+            end
                     
 %                     check = isempty(allIndexStarts)
 %                     if check == 0

@@ -28,7 +28,7 @@ for i = 3:1:length(files)
             eventEnds = [];
 
             for i = 1:length(x)
-                if x(i) == 119.0000
+                if x(i) == 119.0000 % This represent the ascII for wheeze start 
                     eventStarts(wheezeEventCounts) = x(i-2);
                     eventEnds(wheezeEventCounts) = x(i-1);
              
@@ -36,8 +36,9 @@ for i = 3:1:length(files)
                 end  
             end
          
-            dlmwrite
-     
+        eventsDiff= eventEnds - eventStarts;
+        allMeans(i) = mean(eventsDiff);
+        
     end
      
      
