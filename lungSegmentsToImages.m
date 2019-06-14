@@ -1,9 +1,11 @@
 % Titus John
-% August 14, 2018
+% May 13, 2019
 
 clc
 close all
+clear all
 
+load('wheezeFileSplit.mat');
 
 files = dir(fullfile(pwd, '*.txt'));
 fileCount = 1;
@@ -13,9 +15,10 @@ wheezeCrackleCount =1 ;
 crackleCount = 1;
 normalCount = 1;
 wheezeCount = 1;
-wheezeEventOverallCount = 0; 
+wheezeEventOverallCount = 0 ; 
 AllWheezeTimeStarts = [];
 checkErrorTemp = 0;
+usableEvents = 0; 
 
 %Segemented groundTrutch signals with correponding Fs
 Signals = {};
@@ -55,22 +58,14 @@ for i = 1:length(files)
                 %% This is to check if the file exist in the training testing split method
                  fileProcess = 0; %This variable sees if the files exist in training random spit
 
-                for k = 1:length(TrainingFileNames)
-                    if strcmp(eventFilename,TrainingFileNames{k})
+                for k = 1:length(TestingFileNames)
+                    if strcmp(eventFilename,TestingFileNames{k})
                         fileProcess = 1;
                     end
                 end
 
                 if fileProcess ==1
-               %% This is for reading the segmenetation events
-                %             audioLabelData =  textread(textFilename); %Read the text file into workspace
-                % 
-                %             cycleStart = audioLabelData(:,1); 
-                %             cycleEnd = audioLabelData(:,2);
-                %             cracklePresent = audioLabelData(:,3);
-                %             wheezePresent = audioLabelData(:,4);
-                %             numCycles = length(cycleStart);
-
+     
                             [rawWholeSignal,ogFs] = audioread(wavFilename ); %Read the signal in if applicable
                             allIndexStarts = [];
 
@@ -154,28 +149,17 @@ for i = 1:length(files)
                                             groundTruthSegmentedSignal = rawWholeSignal(indexStart:indexEnd);
                                             %eventSignal = rawWholeSignal(indexStart:indexEnd);
                                             
-                                            
-                                            
                                              %Going to center the wheeze event in the
                                              %middele of the spectorgram
-                                             if (indexStart+(ogFs*.325)) < indexEnd && indexStart > (ogFs*.325)
-                                                 
-                                                eventSignal = rawWholeSignal((indexStart-(ogFs*.325)):(indexStart+(ogFs*.325))); % .65 sec represents the window size
+                                             if (indexStart+(ogFs*.325)) < indexEnd && length(rawWholeSignal) > (indexEnd+(ogFs*.325)) && (indexStart-(ogFs*.325)) > 0                  
+                                                usableEvents = usableEvents + 1; 
                                                 
-                                            
-                                                 [filter_out] = plotWaveCoeff(eventSignal,ogFs);
-
-                                                %%%%%% Here signal Remsamples
-                                                Fs = 4000;
-
-                                                if length(filter_out) > 128
-                                                    figure(1)
-                                                    
-                                                    spectrogram(filter_out,128,120,128,Fs,'yaxis')
-                                                    title(hardware)
-                                                end
+                                                s = (indexStart-ceil(ogFs*.325));
+                                                e = (indexEnd+ceil(ogFs*.325));
                                                 
-                                             end
+                                                eventSignal = rawWholeSignal(s:e); % .65 sec represents the window size
+                                                windowEventSignalSplit(eventSignal,ogFs,hardware,wheezeEventOverallCount)
+                                              end
                                             
                                             
 %                                             allIndexStarts(cycleCount) = indexStart;
@@ -205,47 +189,7 @@ for i = 1:length(files)
                                     end
             %end
                     
-%                     check = isempty(allIndexStarts)
-%                     if check == 0
-%                         if sum(cracklePresent) ~= numCycles
-%                             if Fs == 44100
-%                                 %                              [groundTruthEnvelope] = plotGroundTruthEnvelope(allIndexStarts, allIndexEnds,Norig, Fs );
-%                                 %                              [cd1_filter_out,downReGround] = plotWaveCoeff(rawWholeSignal, groundTruthEnvelope, Fs);
-%                                 %
-%                                 %                              cd1_filter_out = downsample((cd1_filter_out(2:end)),10);
-%                                 %                              downReGround = downsample(downReGround,10);
-%                                 %
-%                                 %
-%                                 %                     %            [hilbertEnv] = envelopeExtraction(filter_out, Fs);
-%                                 %
-%                                 %                     %            groundTruthEnvelope = downsample(groundTruthEnvelope,100);
-%                                 %                     %            hilbertEnv = downsample(hilbertEnv ,100);
-%                                 %
-%                                 %         %                      figure(1)
-%                                 %         %                      plot(groundTruthEnvelope,'r')
-%                                 %                     %              hold on
-%                                 %                     %              plot(hilbertEnv)
-%                                 %
-%                                 %                                     cd('rawVector/')
-%                                 %                                     %csvwrite(strcat(temp{1},'_data.csv'),hilbertEnv)
-%                                 %                                     mex_WriteMatrix(strcat(temp{1},'_data.csv'),cd1_filter_out, '%10.10f', ',', 'w+'); % 30 times faster!
-%                                 %                                     cd ..
-%                                 %
-%                                 %                                     cd('labels/')
-%                                 %                                     %writematrix(strcat(groundTruthEnvolope,temp{1},'_label.csv'),'Delimiter',' ')
-%                                 %                                     %csvwrite(strcat(temp{1},'_label.csv'),groundTruthEnvolope, '%i', ' ', 'w+');  % 30 times faster!
-%                                 %                                     dlmwrite((strcat(temp{1},'_label.csv')),downReGround,' ')
-%                                 %                                     cd ..
-%                                 %
-%                                 %                                     figure(1)
-%                                 %                                     plot(cd1_filter_out)
-%                                 %                                     hold on
-%                                 %                                     plot(downReGround,'r')
-%                                 %                                     hold off
-%                                 %
-%                                 %                                     fileCount = fileCount+1
-%                             end
-%                         end
+
                      end
                end
 end
