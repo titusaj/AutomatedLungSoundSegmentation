@@ -1,4 +1,6 @@
 clear all
+close all
+
 clc
 
 segEventFiles = dir(fullfile('Segementation Events/','*.txt'));
@@ -10,8 +12,12 @@ for i = 1:length(segEventFiles)
     cracklePresent = [];
     wheezePresent = [];
     numCycles = 0 ;
-    cycleCount = 0
+    cycleCount = 0;
+    fileCount = 1;
     
+    groundTruthEnvelope = [];
+    allIndexStarts = [];
+    allIndexEnds = [];
     
     audioLabelData =  textread(fullfile('Segementation Events/',segEventFiles(i).name)); %Read the text file into workspace               
     cycleStart = audioLabelData(:,1); 
@@ -46,40 +52,46 @@ for i = 1:length(segEventFiles)
          end
          
 
-        %Resample to 4000
-       % Fs = 4000;
-        %reSampledRawWhole = resample(rawWholeSignal,Fs,ogFs);
-        %Nresampled = length(reSampledRawWhole)
+         if ogFs > 4000
+            %Resample to 4000
+            Fs = 4000;
+            reSampledRawWhole = resample(rawWholeSignal,Fs,ogFs);
+            Nresampled = length(reSampledRawWhole);
+         end
 
+        hardware
+        ogFs
 
-        [groundTruthEnvelope] = plotGroundTruthEnvelope(allIndexStarts, allIndexEnds,Norig,ogFs );
-        [cd1_filter_out,downReGround] = plotWaveCoeff(rawWholeSignal,groundTruthEnvelope, ogFs);
-        [hilbertEnv] = envelopeExtraction(cd1_filter_out, ogFs);
+        [groundTruthEnvelope] = plotGroundTruthEnvelope(allIndexStarts, allIndexEnds,Norig, Fs, ogFs );
+        [cd1_filter_out,downReGround] = plotWaveCoeff(reSampledRawWhole,groundTruthEnvelope, Fs);
+        %[hilbertEnv] = envelopeExtraction(cd1_filter_out, ogFs);
 
-        groundTruthEnvelope = downsample(groundTruthEnvelope,100);
-        hilbertEnv = downsample(hilbertEnv ,100);
+  
+        
+%         groundTruthEnvelope = downsample(groundTruthEnvelope,100);
+%         hilbertEnv = downsample(hilbertEnv ,100);
+% 
+%         figure(1)
+%         plot(groundTruthEnvelope,'r')
+%         hold on
+%         plot(hilbertEnv)
 
-        figure(1)
-        plot(groundTruthEnvelope,'r')
-        hold on
-        plot(hilbertEnv)
-
-        cd('rawVector/')
-        %csvwrite(strcat(temp{1},'_data.csv'),hilbertEnv)
-        mex_WriteMatrix(strcat(temp{1},'_data.csv'),cd1_filter_out, '%10.10f', ',', 'w+'); % 30 times faster!
-        cd ..
-
-        cd('labels/')
-        %writematrix(strcat(groundTruthEnvolope,temp{1},'_label.csv'),'Delimiter',' ')
-        %csvwrite(strcat(temp{1},'_label.csv'),groundTruthEnvolope, '%i', ' ', 'w+');  % 30 times faster!
-        dlmwrite((strcat(temp{1},'_label.csv')),downReGround,' ')
-        cd ..
-
-        figure(1)
-        plot(cd1_filter_out)
-        hold on
-        plot(downReGround,'r')
-        hold off
+%         cd('rawVector/')
+%         %csvwrite(strcat(temp{1},'_data.csv'),hilbertEnv)
+%         mex_WriteMatrix(strcat(temp{1},'_data.csv'),cd1_filter_out, '%10.10f', ',', 'w+'); % 30 times faster!
+%         cd ..
+% 
+%         cd('labels/')
+%         %writematrix(strcat(groundTruthEnvolope,temp{1},'_label.csv'),'Delimiter',' ')
+%         %csvwrite(strcat(temp{1},'_label.csv'),groundTruthEnvolope, '%i', ' ', 'w+');  % 30 times faster!
+%         dlmwrite((strcat(temp{1},'_label.csv')),downReGround,' ')
+%         cd ..
+% 
+%         figure(1)
+%         plot(cd1_filter_out)
+%         hold on
+%         plot(downReGround,'r')
+%         hold off
 
         fileCount = fileCount+1
 end                    
