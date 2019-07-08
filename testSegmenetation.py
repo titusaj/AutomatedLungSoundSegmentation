@@ -29,9 +29,14 @@ ap.add_argument("-m", "--model", required=True,
 args = vars(ap.parse_args())
 # initialize the number of epochs to train for, initial learning rate,
 # and batch size
-EPOCHS = 100000
+EPOCHS = 5
 INIT_LR = 1e-4
-BS = 4000
+BS = 5
+
+import os
+os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID";
+# The GPU id to use, usually either "0" or "1";
+os.environ["CUDA_VISIBLE_DEVICES"]="1";
 
 # initialize the data and labels
 

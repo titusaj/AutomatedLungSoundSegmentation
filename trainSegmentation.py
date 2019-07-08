@@ -2,6 +2,7 @@
 
 # set the matplotlib backend so figures can be saved in the background
 import matplotlib
+import tensorflow as tf
 matplotlib.use("Agg")
 
 # import the necessary packages
@@ -31,14 +32,26 @@ import csv
 import os
 from scipy import signal, misc
 
+#Import the model
 from unetLungSounds import unetLungNet
+
+
+
+#Allow one gpu to
+os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID";
+os.environ["CUDA_VISIBLE_DEVICES"]="1";
+#This allows for gpu memory growth over all visipble gpus
+config = tf.ConfigProto()
+config.gpu_options.allow_growth = True
+
+
 
 # construct the argument parse and parse the arguments
 ap = argparse.ArgumentParser()
-ap.add_argument("-d", "--dataset", required=True,
-	help="path to input dataset")
-ap.add_argument("-l", "--labels", required=True,
-	help="path to input label vectors")
+#ap.add_argument("-d", "--dataset", required=True,
+#	help="path to input dataset")
+#ap.add_argument("-l", "--labels", required=True,
+#	help="path to input label vectors")
 ap.add_argument("-m", "--model", required=True,
 	help="path to output model")
 args = vars(ap.parse_args())
@@ -46,9 +59,9 @@ args = vars(ap.parse_args())
 
 # initialize the number of epochs to train for, initial learning rate,
 # and batch size
-EPOCHS = 100000
+EPOCHS = 5
 INIT_LR = 1e-4
-BS = 400
+BS = 5
 
 # initialize the data and labels
 
