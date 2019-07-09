@@ -48,10 +48,10 @@ config.gpu_options.allow_growth = True
 
 # construct the argument parse and parse the arguments
 ap = argparse.ArgumentParser()
-#ap.add_argument("-d", "--dataset", required=True,
-#	help="path to input dataset")
-#ap.add_argument("-l", "--labels", required=True,
-#	help="path to input label vectors")
+ap.add_argument("-d", "--dataset", required=True,
+	help="path to input dataset")
+ap.add_argument("-l", "--labels", required=True,
+	help="path to input label vectors")
 ap.add_argument("-m", "--model", required=True,
 	help="path to output model")
 args = vars(ap.parse_args())
@@ -70,7 +70,7 @@ labels = []
 
 resampledHilberts=[]
 resampledLabels = []
-'''
+
 print(args["dataset"])
 # Envolope Directory loading
 print("[INFO] loading raw envolopes in...")
@@ -105,7 +105,7 @@ for filename in os.listdir(args["labels"]):
 
 target = np.array(labels)
 np.save('targetTrain.npy', target)
-'''
+
 X = np.load('dataTrain.npy')
 Y = np.load('targetTrain.npy')
 
