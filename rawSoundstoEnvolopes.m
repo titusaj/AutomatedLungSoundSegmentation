@@ -63,6 +63,7 @@ for i = 1:length(segEventFiles)
         ogFs
 
         [groundTruthEnvelope] = plotGroundTruthEnvelope(allIndexStarts, allIndexEnds,Norig, Fs, ogFs );
+        
         [cd1_filter_out,downReGround] = plotWaveCoeff(reSampledRawWhole,groundTruthEnvelope, Fs);
         %[hilbertEnv] = envelopeExtraction(cd1_filter_out, ogFs);
 
