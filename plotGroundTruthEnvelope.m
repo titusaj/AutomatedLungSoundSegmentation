@@ -4,7 +4,7 @@
 function [groundTruthEnvolope] = plotGroundTruthEnvelope(allIndexStarts, allIndexEnds,Norig,Fs, ogFs )
 
     % Create the change mask envolope
-    groundTruthEnvolope = zeros(1, Norig);
+    groundTruthEnvolope = ones(1, Norig);
     
     %This is the window of segmentation length that we need for
     %segementation
@@ -14,7 +14,7 @@ function [groundTruthEnvolope] = plotGroundTruthEnvelope(allIndexStarts, allInde
         if allIndexStarts(i) ~= 0 && allIndexStarts(i) > halfWindowLength
             allIndexStarts(i);
             allIndexEnds(i);
-            groundTruthEnvolope(allIndexStarts(i)-halfWindowLength:allIndexStarts(i)+halfWindowLength) = 1;
+            groundTruthEnvolope(allIndexStarts(i)-halfWindowLength:allIndexStarts(i)+halfWindowLength) = 0;
         end
     end
     
