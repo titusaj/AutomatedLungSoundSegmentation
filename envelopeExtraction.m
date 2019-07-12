@@ -14,7 +14,7 @@ function [hilbertEnv] = envelopeExtraction(filteredSignal, Fs)
 %% Hilbert
     hilbertEnv = abs(hilbert(filteredSignal));
 
-% %% Wavelet
+% %% Wavelet 
 %     win_time = 40/1000; % sec
 %     overlap_per = 0.5;
 %     time_interval = win_time * overlap_per; % sec

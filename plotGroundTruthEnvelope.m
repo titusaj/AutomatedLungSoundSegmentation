@@ -8,7 +8,7 @@ function [groundTruthEnvolope] = plotGroundTruthEnvelope(allIndexStarts, allInde
     
     %This is the window of segmentation length that we need for
     %segementation
-    halfWindowLength = 100;
+    halfWindowLength = .1*ogFs;
     
     for i = 1:length(allIndexStarts)      
         if allIndexStarts(i) ~= 0 && allIndexStarts(i) > halfWindowLength
@@ -19,6 +19,6 @@ function [groundTruthEnvolope] = plotGroundTruthEnvelope(allIndexStarts, allInde
     end
     
     
-     groundTruthEnvolope = resample(groundTruthEnvolope,Fs,ogFs);
+     %groundTruthEnvolope = resample(groundTruthEnvolope,Fs,ogFs);
 
 end
