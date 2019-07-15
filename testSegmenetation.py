@@ -29,9 +29,9 @@ ap.add_argument("-m", "--model", required=True,
 args = vars(ap.parse_args())
 # initialize the number of epochs to train for, initial learning rate,
 # and batch size
-EPOCHS = 5
+EPOCHS = 50
 INIT_LR = 1e-4
-BS = 5
+BS = 50
 
 import os
 os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID";

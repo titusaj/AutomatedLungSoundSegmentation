@@ -10,16 +10,10 @@ from keras.callbacks import ModelCheckpoint, LearningRateScheduler
 from keras import backend as keras
 from keras.backend import transpose
 
-
-smooth = 1.
-
-
-
-
 def unetLungNet():
     model = Sequential()
 
-    inputs = Input(shape=(4000,1))
+    inputs = Input(shape=(8000,1))
 
     conv1 = Conv1D(8, 3, activation='relu', padding='same')(inputs)
     conv1 = Conv1D(8, 3, activation='relu', padding='same')(conv1)
