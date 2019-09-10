@@ -6,7 +6,7 @@ files = dir(fullfile(pwd, '*.txt'));
 cycleCount = 1; % This is numfiles * the cycle count (based on each file thats read into memory)
 
 
-for i = 1:length(files)
+for i = 8:length(files)
 i
 %Intialize and clear variables each time    
 rawWholeSignal = [];
@@ -43,8 +43,8 @@ wheezePresent = audioLabelData(:,4);
 numCycles = length(cycleStart);
 
 
-     if isfile(wavFilename) && sum(wheezePresent) == 0 && sum(cracklePresent) == 0   % right now just looking the normal fiels
-         
+
+if isfile(wavFilename) && sum(wheezePresent)  > 0 || sum(cracklePresent) > 0   % right now just looking the normal fiels         
        %% This is to calculate information about cycles
          for j = 1:numCycles
              allCycleLengths(j) = cycleEnd(j) - cycleStart(j);
@@ -72,47 +72,64 @@ numCycles = length(cycleStart);
 
             
         %% Segment out the cycles
-        [d, indexStart] = min(abs( rawTime-round(cycleStart(j),3)));
-        [d, indexEnd ] = min(abs( rawTime-round(cycleEnd(j),3)));                    
-        groundTruthSegmentedSignal = normfilterOut(indexStart:indexEnd);
-        
-        
+        for j = 1:numCycles
+            [d, indexStarts(j)] = min(abs( rawTime-round(cycleStart(j),3)));
+            [d, indexEnds(j) ] = min(abs( rawTime-round(cycleEnd(j),3)));                    
+%             groundTruthSegmentedSignal = normfilterOut(indexStart:indexEnd);
+%             THRESHOLD = 2.5
+%             runLTSD(fs,groundTruthSegmentedSignal,THRESHOLD )  
+        end
+%         close all
+%         
 %         figure(1);
 %         t1 = (1:length(groundTruthSegmentedSignal))./fs;
 %         plot(t1, groundTruthSegmentedSignal)
 
         %% Plot the signal with the ground truth
-%             figure('Name', 'PCG features');
-%             t1 = (1:length(rawWholeSignal))./fs;
-%             plot(t1,rawWholeSignal);
-%             hold on;
-%             t2 = (1:length(PCG_Features))./featuresFs;
-%             plot(t2,PCG_Features);
-% 
-% 
-%             for k=1:length(cycleStart)
-%                 vline([cycleStart(k)],['g'])
+            figure('Name', 'PCG features');
+            t1 = (1:length(rawWholeSignal))./fs;
+            plot(t1,rawWholeSignal);
+            hold on;
+            %t2 = (1:length(PCG_Features))./featuresFs;
+            %plot(t2,PCG_Features);
+
+
+            for k=1:length(cycleStart)
+                vline([cycleStart(k)],['g'])
+                %%this draw a line midway adding the half median cycle
+                %%count to the start of the cycle
+                 %if k ~=length(cycleStart) % check not at the end
+                 %    vline([cycleStart(k)+halfMedianCycleLength],['k'])
+                 %end
+           end
+            
+            hold on
+            for k=1:length(cycleEnd)
+                vline([cycleEnd(k)],['r'])
+            end
+            hold off
+            
+            
+            
+            %% Create Ground Truth Envelope bsed on the segmented cycle annotation
+            groundTruthEnvolope = zeros(1, length(t1));
+            for j = 1:numCycles
                 
-                %this draw a line midway adding the half median cycle
-                %count to the start of the cycle
-%                 if k ~=length(cycleStart) % check not at the end
-%                     vline([cycleStart(k)+halfMedianCycleLength],['k'])
-%                 end
-%            end
+                if wheezePresent(j) == 1
+                    groundTruthEnvolope(indexStarts(j):indexEnds(j)) = 1; %Set wheeze to 1
+
+                elseif cracklePresent(j) == 1
+                    groundTruthEnvolope(indexStarts(j):indexEnds(j)) = 2; %Set crackle to two
+                    
+                elseif cracklePresent(j) == 1 && wheezePresent(j) == 1
+                    groundTruthEnvolope(indexStarts(j):indexEnds(j)) = 3; %Set crackle to three
+                    
+                end
+            end
             
-%             hold on
-%             for k=1:length(cycleEnd)
-%                 vline([cycleEnd(k)],['r'])
-%             end
-%             hold off
-            
-            demo
-            
-            %% Ground Truth Envelope
-%             groundTruthEnvolope = zeros(1, length(t2));
-%             for  i =1:length(groundTruthEnvolope)
-%                 
-%             end
+            hold on
+            plot(t1,groundTruthEnvolope,'k');
+          
 %% Write the raw vector to a file
 %         cd('rawHilberts/')
 %         %csvwrite(strcat(temp{1},'_data.csv'),hilbertEnv)
@@ -122,7 +139,7 @@ numCycles = length(cycleStart);
 %         
       
 
-     end
-
+ 
+end
 
 end
